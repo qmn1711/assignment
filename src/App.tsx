@@ -6,6 +6,9 @@ import sortBy from 'lodash/sortBy';
 import uniqBy from 'lodash/uniqBy';
 import orderBy from 'lodash/orderBy';
 import isEmpty from 'lodash/isEmpty';
+import isFunction from 'lodash/isFunction';
+import find from 'lodash/find';
+import filter from 'lodash/filter';
 
 const CANDIDATES_ENDPOINT =
   'http://personio-fe-test.herokuapp.com/api/v1/candidates';
@@ -317,7 +320,7 @@ const sampleResult = {
 
 const useTable = ({ columns, data }: any) => {
   const [sorts, setSorts] = useState<any[]>([]);
-  const [filters, setFilters] = useState<any[]>([]);
+  const [filters, setFilters] = useState<any>([]);
   const [headers, setHeaders] = useState<any[]>(columns);
   const [rows, setRows] = useState<any[]>(data);
 
@@ -342,8 +345,36 @@ const useTable = ({ columns, data }: any) => {
   }, [sorts]);
 
   useEffect(() => {
-    console.log('filters update effect');
-  }, [filters]);
+    console.log('filters update effect', filters);
+
+    if (!isEmpty(filters)) {
+      setRows((rows) =>
+        filter(data, (row) => {
+          let match = false;
+
+          for (let i = 0; i < filters.length; i++) {
+            const value = row[filters[i].accessor];
+            const filterValue = filters[i].filterValue;
+
+            switch (typeof value) {
+              case 'string':
+                match = value.toLowerCase().includes(filterValue.toLowerCase());
+                break;
+              case 'number':
+                match = value === parseInt(filterValue);
+                break;
+            }
+
+            if (match === false) {
+              break;
+            }
+          }
+
+          return match;
+        })
+      );
+    }
+  }, [filters, data]);
 
   const accessors = columns.map((column: any) => column.accessor); // TODO use reduce for only one loop
   const resultHeaders = headers.map((column: any, i: number) => {
@@ -353,7 +384,11 @@ const useTable = ({ columns, data }: any) => {
 
     // TODO adapt the props from url query
     if (column.sorting) {
-      headerProps.onClick = () => {
+      headerProps.onClick = (e: any) => {
+        // e.preventDefault();
+        // e.stopPropagation();
+        // e.nativeEvent.stopImmediatePropagation();
+
         console.log('do something on click');
         // sorting
         // update state sorting
@@ -374,14 +409,32 @@ const useTable = ({ columns, data }: any) => {
       headerProps.style = { cursor: 'pointer' };
     }
 
-    if (column.filtering) {
+    if (isFunction(column.filtering)) {
       setFilter = (value: string) => {
-        headers[i] = { ...column, filterValue: value };
-        setHeaders([...headers]);
-        // TODO separate filterValue for useEffect
         console.log('filter do something');
+        setFilters(
+          uniqBy(
+            [{ accessor: column.accessor, filterValue: value }, ...filters],
+            'accessor'
+          )
+        );
+
+        // setFilters({
+        //   ...filter,
+        //   [column.accessor]: value,
+        // });
+
+        // headers[i] = { ...column, filterValue: value };
+        // setHeaders([...headers]);
+        // TODO separate filterValue for useEffect
       };
     }
+
+    console.log(
+      'column.filtering',
+      column.filtering,
+      isFunction(column.filtering)
+    );
 
     return {
       getHeaderProps: () => {
@@ -393,6 +446,20 @@ const useTable = ({ columns, data }: any) => {
       sortOrder: column.sortOrder,
       filterValue: column.filterValue,
       setFilter,
+      renderFilter: isFunction(column.filtering)
+        ? () => {
+            console.log('renderFilter', filters);
+            return column.filtering({
+              filterValue: find(filters, { accessor: column.accessor })
+                ?.filterValue,
+              setFilter,
+            });
+            // return column.filtering({
+            //   filterValue: filters[column.accessor],
+            //   setFilter,
+            // });
+          }
+        : undefined,
     };
   });
   const resultRows = rows.map((item: any) => {
@@ -414,6 +481,22 @@ const useTable = ({ columns, data }: any) => {
     headers: resultHeaders,
     rows: resultRows,
   };
+};
+
+const TextFilter = ({ filterValue, setFilter }: any) => {
+  const changeHandler = (e: any) => {
+    // e.preventDefault();
+    // e.stopPropagation();
+    // e.nativeEvent.stopImmediatePropagation();
+
+    e.persist();
+    e.nativeEvent.stopImmediatePropagation();
+    e.stopPropagation();
+
+    setFilter(e.target.value);
+  };
+
+  return <input value={filterValue || ''} onChange={changeHandler} />;
 };
 
 function App() {
@@ -454,6 +537,12 @@ function App() {
       {
         header: 'Name',
         accessor: 'name',
+        filtering: (props: any) => {
+          return <TextFilter {...props} />;
+        },
+        // filterWay: ({ filterValue, row }: any) => {
+        //   return filterValue ? row.name?.include(filterValue) : true;
+        // }
       },
       {
         header: 'Email',
@@ -472,6 +561,9 @@ function App() {
         header: 'Position applied',
         accessor: 'position_applied',
         sorting: true,
+        filtering: (props: any) => {
+          return <TextFilter {...props} />;
+        },
       },
       {
         header: 'Applied',
@@ -481,6 +573,9 @@ function App() {
       {
         header: 'Status',
         accessor: 'status',
+        filtering: (props: any) => {
+          return <TextFilter {...props} />;
+        },
       },
     ],
     []
@@ -502,7 +597,8 @@ function App() {
               <tr>
                 {headers.map((column: any) => (
                   <th {...column.getHeaderProps()}>
-                    {column.render()} {column.sortOrder}
+                    {column.render()} {column.sortOrder}{' '}
+                    {column.renderFilter && column.renderFilter()}
                   </th>
                 ))}
               </tr>
