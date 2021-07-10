@@ -3,10 +3,14 @@ import isEmpty from 'lodash/isEmpty';
 export const SORT_PREFIX = 'sort_';
 export const FILTER_PREFIX = 'filter_';
 
-export function calculateAge(birthday: Date) { // birthday is a date
+export function calculateAge(birthday: Date) {
   var ageDifMs = Date.now() - birthday.getTime();
   var ageDate = new Date(ageDifMs); // miliseconds from epoch
   return Math.abs(ageDate.getUTCFullYear() - 1970);
+}
+
+export function capitalizeFirstLetter(text: string) {
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : text;
 }
 
 export function buildUrlParams(sorts: any[], filters: any[]) {

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import useTable from '../hooks/useTable';
-import { VirtualScroller2 } from './VirtualScroller';
+import VirtualScroller from './VirtualScroller';
 
 import './DivTable.css';
 
@@ -16,11 +16,30 @@ export const TextFilter = ({ filterValue, setFilter }: any) => {
 
   return (
     <input
-      className="filter-input"
+      className="filter-input no-focusborder"
+      placeholder="search..."
       value={filterValue || ''}
       onChange={changeHandler}
       onClick={clickHandler}
     />
+  );
+};
+
+export const Select = ({ data, filterValue, setFilter }: any) => {
+  const changeHandler = ({ target: { value } }: any) => setFilter(value);
+
+  return (
+    <select
+      className="filter-select no-focusborder"
+      value={filterValue}
+      onChange={changeHandler}
+    >
+      {data.map(({ value, text }: any, i: number) => (
+        <option key={i} value={value}>
+          {text}
+        </option>
+      ))}
+    </select>
   );
 };
 
@@ -37,7 +56,7 @@ export function DivTable({
     filters: tableQuery.filters,
   });
 
-  const settings2 = {
+  const settings = {
     itemHeight: 40,
     amount: 10,
     tolerance: 0,
@@ -46,20 +65,10 @@ export function DivTable({
     startIndex: 1,
   };
 
-  const getData2 = (offset: any, limit: any) => {
-    console.log('getData2 getData2 getData2 getData2 getData2', offset, limit);
-    const dataResult = [];
-    const start = Math.max(settings2.minIndex, offset);
-    const end = Math.min(offset + limit - 1, settings2.maxIndex);
-    console.log(
-      `request [${offset}..${offset + limit - 1}] -> [${start}..${end}] items`
-    );
-    if (start <= end) {
-      for (let i = start; i <= end; i++) {
-        dataResult.push(data[i]);
-      }
-    }
-    return dataResult;
+  const renderSortOrder = (sortOrder: string) => {
+    if (!sortOrder) return null;
+
+    return <i className={`arrow ${sortOrder === 'asc' ? 'down' : 'up'}`} />;
   };
 
   useEffect(() => {
@@ -70,24 +79,26 @@ export function DivTable({
     <div className="table">
       <div className="header-container">
         <div className="headers">
-          {headers.map((column: any) => (
-            <div className={column.getClassName('header-column')} {...column.getHeaderProps()}>
-              {column.render()} {column.getSortOrder()}{' '}
+          {headers.map((column: any, i: number) => (
+            <div
+              key={i}
+              className={column.getClassName('header-column')}
+              {...column.getHeaderProps()}
+            >
+              <div className="header-text">
+                {column.render()} {renderSortOrder(column.getSortOrder())}
+              </div>
               {column.renderFilter && column.renderFilter()}
             </div>
           ))}
         </div>
       </div>
       <div>
-        <VirtualScroller2
+        <VirtualScroller
           className="content-viewport"
-          getData={getData2}
-          settings={settings2}
-          row={null}
+          settings={settings}
         >
           {({ index }: any) => {
-            console.log('VirtualScroller2 child', index);
-
             const row = rows[index];
             const styleClass = index % 2 ? 'even' : 'odd';
 
@@ -103,25 +114,7 @@ export function DivTable({
               </div>
             );
           }}
-        </VirtualScroller2>
-        {/* {rows.map((row: any, i: number) => {
-                return (
-                  <tr>
-                    {row.cells.map((cell: any) => {
-                      return <td>{cell.render()}</td>;
-                    })}
-                  </tr>
-                );
-              })} */}
-        {/* {rows.map((row: any, i: number) => {
-                return (
-                  <tr>
-                    {row.cells.map((cell: any) => {
-                      return <td>{cell.render()}</td>;
-                    })}
-                  </tr>
-                );
-              })} */}
+        </VirtualScroller>
       </div>
     </div>
   );

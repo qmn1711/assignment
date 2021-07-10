@@ -1,13 +1,32 @@
 import React, { useMemo } from 'react';
 
-import logo from './logo.svg';
-import { buildTableQueryFromUrlParams, buildUrlParams, calculateAge } from './utils';
+import { buildTableQueryFromUrlParams, buildUrlParams, calculateAge, capitalizeFirstLetter } from './utils';
 import sampleResult from './sample_data.json';
-import { DivTable, TextFilter } from './components/DivTable';
+import { DivTable, Select, TextFilter } from './components/DivTable';
 
+import logo from './logo.svg';
 import './App.css';
 
 const tableQuery = buildTableQueryFromUrlParams(window.location.search);
+
+export const StatusData = [
+  {
+    value: '',
+    text: 'All',
+  },
+  {
+    value: 'waiting',
+    text: 'Waiting',
+  },
+  {
+    value: 'approved',
+    text: 'Approved',
+  },
+  {
+    value: 'rejected',
+    text: 'Rejected',
+  }
+];
 
 const getColumns = () => {
   return [
@@ -55,8 +74,11 @@ const getColumns = () => {
     {
       header: 'Status',
       accessor: 'status',
+      render: (value: string) => {
+        return capitalizeFirstLetter(value);
+      },
       filtering: (props: any) => {
-        return <TextFilter {...props} />;
+        return <Select data={StatusData} {...props} />;
       },
     },
   ];

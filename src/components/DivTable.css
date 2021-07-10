@@ -12,8 +12,18 @@
   flex-direction: row;
 }
 
+.header-text {
+  position: relative;
+}
+
 .header-column {
-  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding-bottom: 5px;
+  height: 55px;
   border-right: 1px solid black;
 }
 
@@ -36,12 +46,16 @@
 .row.even {
 }
 
-
 .row.odd {
   background: #eee;
 }
 
 .cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
   border-right: 1px solid black;
 }
 
@@ -51,12 +65,12 @@
 
 .header-column.name,
 .cell.name {
-  width: 100px;
+  width: 200px;
 }
 
 .header-column.email,
 .cell.email {
-  width: 20%;
+  width: 25%;
 }
 
 .header-column.birth_date,
@@ -66,25 +80,61 @@
 
 .header-column.year_of_experience,
 .cell.year_of_experience {
-  width: 70px;
+  width: 200px;
 }
 
 .header-column.position_applied,
 .cell.position_applied {
-  width: 70px;
+  width: 200px;
 }
 
 .header-column.application_date,
 .cell.application_date {
-  /* width: 70px; */
-  flex: 1 1 auto;
+  width: 120px;
+  /* flex: 1 1 auto; */
 }
 
 .header-column.status,
 .cell.status {
-  width: 70px;
+  /* width: 70px; */
+  flex: 1 1 auto;
 }
 
 .filter-input {
-  width: 60px;
+  margin-top: 5px;
+  width: 100px;
+  border-radius: 9px;
+}
+
+.filter-select {
+  margin-top: 5px;
+  border-radius: 9px;
+}
+
+.no-focusborder:focus {
+  outline-style: none;
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.arrow {
+  position: absolute;
+
+  width: 0;
+  height: 0;
+  margin-left: 5px;
+}
+
+.arrow.up {
+  top: 7px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid black;
+}
+
+.arrow.down {
+  top: 7px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid black;
 }

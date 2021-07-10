@@ -18,22 +18,14 @@ const useTable = ({ columns, data, sorts, filters }: any) => {
   const [rows, setRows] = useState<any[]>(data);
 
   useEffect(() => {
-    console.log('sorts update effect', sortsState);
-
     if (!isEmpty(sortsState)) {
       const fields = sortsState.map((sort) => sort.accessor);
       const sortOrders = sortsState.map((sort) => sort.sortOrder);
-
-      console.log('fields', fields);
-      console.log('sortOrders', sortOrders);
-
       setRows((rows) => orderBy(rows, fields, sortOrders));
     }
   }, [sortsState]);
 
   useEffect(() => {
-    console.log('filters update effect', filtersState);
-
     if (!isEmpty(filtersState)) {
       setRows(
         filter(data, (row: any) => {
@@ -72,7 +64,6 @@ const useTable = ({ columns, data, sorts, filters }: any) => {
     // TODO adapt the props from url query
     if (column.sorting) {
       headerProps.onClick = (e: any) => {
-        console.log('do something on click');
         // sorting
         // update state sorting
         const sortOrder =
@@ -97,7 +88,6 @@ const useTable = ({ columns, data, sorts, filters }: any) => {
 
     if (isFunction(column.filtering)) {
       setFilter = debounce((value: string) => {
-        console.log('filter do something');
         setFiltersState(
           uniqBy(
             [
@@ -109,12 +99,6 @@ const useTable = ({ columns, data, sorts, filters }: any) => {
         );
       }, 85);
     }
-
-    console.log(
-      'column.filtering',
-      column.filtering,
-      isFunction(column.filtering)
-    );
 
     return {
       getHeaderProps: () => {
@@ -135,16 +119,11 @@ const useTable = ({ columns, data, sorts, filters }: any) => {
       setFilter,
       renderFilter: isFunction(column.filtering)
         ? () => {
-            console.log('renderFilter', filtersState);
             return column.filtering({
               filterValue: find(filtersState, { accessor: column.accessor })
                 ?.filterValue,
               setFilter,
             });
-            // return column.filtering({
-            //   filterValue: filters[column.accessor],
-            //   setFilter,
-            // });
           }
         : undefined,
     };
@@ -162,8 +141,6 @@ const useTable = ({ columns, data, sorts, filters }: any) => {
             const column = find(columns, { accessor: key });
             if (column && isFunction(column.render)) {
             }
-
-            console.log('column', column, key);
 
             return column && isFunction(column.render)
               ? column.render(item[key])
