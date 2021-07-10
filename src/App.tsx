@@ -2,9 +2,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import values from 'lodash/values';
+import sortBy from 'lodash/sortBy';
+import uniqBy from 'lodash/uniqBy';
+import orderBy from 'lodash/orderBy';
+import isEmpty from 'lodash/isEmpty';
 
 const CANDIDATES_ENDPOINT =
-  'http://personio-fe-test.herokuapp.com/api/v1/candidates'
+  'http://personio-fe-test.herokuapp.com/api/v1/candidates';
 
 const sampleResult = {
   data: [
@@ -312,65 +316,103 @@ const sampleResult = {
 };
 
 const useTable = ({ columns, data }: any) => {
+  const [sorts, setSorts] = useState<any[]>([]);
+  const [filters, setFilters] = useState<any[]>([]);
+  const [headers, setHeaders] = useState<any[]>(columns);
+  const [rows, setRows] = useState<any[]>(data);
+
   // const sampleColumns = [
   //   { Header: 'First Name', accessor: 'firstName' },
   //   { Header: 'Middle Name', accessor: 'middleName' },
   //   { Header: 'First Name', accessor: 'firstName' },
   // ];
 
+  useEffect(() => {
+    console.log('sorts update effect', sorts);
+
+    if (!isEmpty(sorts)) {
+      const fields = sorts.map((sort) => sort.accessor);
+      const sortOrders = sorts.map((sort) => sort.sortOrder);
+
+      console.log('fields', fields);
+      console.log('sortOrders', sortOrders);
+
+      setRows((rows) => orderBy(rows, fields, sortOrders));
+    }
+  }, [sorts]);
+
+  useEffect(() => {
+    console.log('filters update effect');
+  }, [filters]);
+
   const accessors = columns.map((column: any) => column.accessor); // TODO use reduce for only one loop
-  const headers = columns.map((column: any) => {
-    const header = column.header;
+  const resultHeaders = headers.map((column: any, i: number) => {
+    const colHeader = column.header;
+    const headerProps: any = {};
+    let setFilter: any;
+
+    // TODO adapt the props from url query
+    if (column.sorting) {
+      headerProps.onClick = () => {
+        console.log('do something on click');
+        // sorting
+        // update state sorting
+        const sortOrder =
+          isEmpty(column.sortOrder) || column.sortOrder === 'asc'
+            ? 'desc'
+            : 'asc';
+        headers[i] = { ...column, sortOrder };
+        setHeaders([...headers]);
+        setSorts(
+          uniqBy(
+            [{ accessor: column.accessor, sortOrder: sortOrder }, ...sorts],
+            'accessor'
+          )
+        );
+      };
+
+      headerProps.style = { cursor: 'pointer' };
+    }
+
+    if (column.filtering) {
+      setFilter = (value: string) => {
+        headers[i] = { ...column, filterValue: value };
+        setHeaders([...headers]);
+        // TODO separate filterValue for useEffect
+        console.log('filter do something');
+      };
+    }
 
     return {
-      getHeaderProps: () => {},
-      render: () => {
-        return header;
+      getHeaderProps: () => {
+        return { ...headerProps };
       },
+      render: () => {
+        return colHeader;
+      },
+      sortOrder: column.sortOrder,
+      filterValue: column.filterValue,
+      setFilter,
     };
   });
-  const rows = data.map((item: any) => {
-    const cells = Object.keys(item).filter(key => accessors.includes(key)).map((key) => {
-      return {
-        getCellProps: () => {},
-        render: () => item[key],
-      };
-    });
+  const resultRows = rows.map((item: any) => {
+    const cells = Object.keys(item)
+      .filter((key) => accessors.includes(key))
+      .map((key) => {
+        return {
+          getCellProps: () => {},
+          render: () => item[key],
+        };
+      });
 
     return {
       cells,
     };
   });
 
-  // const headers = [
-  //   {
-  //     // getHeaderProps(),
-  //     // render('Header')
-  //   },
-  //   {
-  //     // getHeaderProps(),
-  //     // render('Header')
-  //   },
-  // ];
-
-  // const rows = [
-  //   {
-  //     // getRowProps(),
-  //     // cells
-  //     // cell.getCellProps()
-  //     // cell.render('Cell')
-  //   },
-  //   {
-  //     // getRowProps(),
-  //     // cells
-  //     // cell.getCellProps()
-  //     // cell.render('Cell')
-  //   },
-  // ];
-
   return {
-    headers,
-    rows,
+    headers: resultHeaders,
+    rows: resultRows,
   };
 };
 
@@ -386,7 +428,9 @@ function App() {
         const response = await fetch(CANDIDATES_ENDPOINT);
         const data = await response.json();
 
-        if (data) {
+        if (data && data.error) {
+          throw new Error(data.error.message);
+        } else if (data) {
           setData(data.data);
         }
         console.log('result', data);
@@ -416,8 +460,27 @@ function App() {
         accessor: 'email',
       },
       {
-        header: 'Years',
+        header: 'Age',
+        accessor: 'birth_date',
+      },
+      {
+        header: 'Years of Experience',
         accessor: 'year_of_experience',
+        sorting: true,
+      },
+      {
+        header: 'Position applied',
+        accessor: 'position_applied',
+        sorting: true,
+      },
+      {
+        header: 'Applied',
+        accessor: 'application_date',
+        sorting: true,
+      },
+      {
+        header: 'Status',
+        accessor: 'status',
       },
     ],
     []
@@ -433,46 +496,27 @@ function App() {
     <div className="App">
       <div>
         <div>Candidates</div>
-        <div>
-          <table style={{ width: '100%' }}>
-            <tr>
-              <th>Firstname</th>
-              <th>Lastname</th>
-              <th>Age</th>
-            </tr>
-            <tr>
-              <td>Jill</td>
-              <td>Smith</td>
-              <td>50</td>
-            </tr>
-            <tr>
-              <td>Eve</td>
-              <td>Jackson</td>
-              <td>94</td>
-            </tr>
-          </table>
-        </div>
         <div className="candidates">
           <table style={{ width: '100%' }}>
             <thead>
               <tr>
-                {headers.map((column: any, i: number) => (
-                  <th key={i}>{column.render()}</th>
+                {headers.map((column: any) => (
+                  <th {...column.getHeaderProps()}>
+                    {column.render()} {column.sortOrder}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-               { rows.map((row: any, i: number) => {
-                 return (
-                  <tr key={i}>
-                    { row.cells.map((cell: any, j: number) => {
-                      return (
-                        <td key={j}>{ cell.render() }</td>
-                      )
-                    }) }
+              {rows.map((row: any, i: number) => {
+                return (
+                  <tr>
+                    {row.cells.map((cell: any) => {
+                      return <td>{cell.render()}</td>;
+                    })}
                   </tr>
-                 );
-               }) }   
+                );
+              })}
             </tbody>
             {/* <tr>
               <th>Firstname</th>
