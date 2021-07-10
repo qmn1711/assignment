@@ -1,4 +1,4 @@
-import React, { Component, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import range from 'lodash/range';
 
 const setInitialState = (settings: any) => {
@@ -72,7 +72,7 @@ function VirtualScroller({ settings, children, className }: any) {
         runScroller({ target: { scrollTop: 0 } });
       }
     }
-  }, []);
+  }, []); // eslint-disable-line
   
   useEffect(() => {
     let newSettings = setInitialState(settings);
