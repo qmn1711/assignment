@@ -484,19 +484,15 @@ const useTable = ({ columns, data }: any) => {
 };
 
 const TextFilter = ({ filterValue, setFilter }: any) => {
-  const changeHandler = (e: any) => {
-    // e.preventDefault();
-    // e.stopPropagation();
-    // e.nativeEvent.stopImmediatePropagation();
-
-    e.persist();
-    e.nativeEvent.stopImmediatePropagation();
+  const clickHandler = (e: any) => {
     e.stopPropagation();
+  };
 
+  const changeHandler = (e: any) => {
     setFilter(e.target.value);
   };
 
-  return <input value={filterValue || ''} onChange={changeHandler} />;
+  return <input value={filterValue || ''} onChange={changeHandler} onClick={clickHandler} />;
 };
 
 function App() {
