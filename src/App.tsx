@@ -9,6 +9,8 @@ import isEmpty from 'lodash/isEmpty';
 import isFunction from 'lodash/isFunction';
 import find from 'lodash/find';
 import filter from 'lodash/filter';
+import { buildTableQueryFromUrlParams, buildUrlParams } from './utils';
+import { debounce } from 'lodash';
 
 const CANDIDATES_ENDPOINT =
   'http://personio-fe-test.herokuapp.com/api/v1/candidates';
@@ -318,9 +320,17 @@ const sampleResult = {
   ],
 };
 
-const useTable = ({ columns, data }: any) => {
-  const [sorts, setSorts] = useState<any[]>([]);
-  const [filters, setFilters] = useState<any>([]);
+const tableQuery = buildTableQueryFromUrlParams(window.location.search);
+
+const useTable = ({ columns, data, sorts, filters }: any) => {
+  const [sortsState, setSortsState] = useState<any[]>(() =>
+    isEmpty(sorts) ? [] : sorts
+    // []
+  );
+  const [filtersState, setFiltersState] = useState<any>(() =>
+    isEmpty(filters) ? [] : filters
+    // []
+  );
   const [headers, setHeaders] = useState<any[]>(columns);
   const [rows, setRows] = useState<any[]>(data);
 
@@ -331,30 +341,30 @@ const useTable = ({ columns, data }: any) => {
   // ];
 
   useEffect(() => {
-    console.log('sorts update effect', sorts);
+    console.log('sorts update effect', sortsState);
 
-    if (!isEmpty(sorts)) {
-      const fields = sorts.map((sort) => sort.accessor);
-      const sortOrders = sorts.map((sort) => sort.sortOrder);
+    if (!isEmpty(sortsState)) {
+      const fields = sortsState.map((sort) => sort.accessor);
+      const sortOrders = sortsState.map((sort) => sort.sortOrder);
 
       console.log('fields', fields);
       console.log('sortOrders', sortOrders);
 
       setRows((rows) => orderBy(rows, fields, sortOrders));
     }
-  }, [sorts]);
+  }, [sortsState]);
 
   useEffect(() => {
-    console.log('filters update effect', filters);
+    console.log('filters update effect', filtersState);
 
-    if (!isEmpty(filters)) {
-      setRows((rows) =>
-        filter(data, (row) => {
+    if (!isEmpty(filtersState)) {
+      setRows(
+        filter(data, (row: any) => {
           let match = false;
 
-          for (let i = 0; i < filters.length; i++) {
-            const value = row[filters[i].accessor];
-            const filterValue = filters[i].filterValue;
+          for (let i = 0; i < filtersState.length; i++) {
+            const value = row[filtersState[i].accessor];
+            const filterValue = filtersState[i].filterValue;
 
             switch (typeof value) {
               case 'string':
@@ -374,7 +384,7 @@ const useTable = ({ columns, data }: any) => {
         })
       );
     }
-  }, [filters, data]);
+  }, [filtersState, data]);
 
   const accessors = columns.map((column: any) => column.accessor); // TODO use reduce for only one loop
   const resultHeaders = headers.map((column: any, i: number) => {
@@ -385,10 +395,6 @@ const useTable = ({ columns, data }: any) => {
     // TODO adapt the props from url query
     if (column.sorting) {
       headerProps.onClick = (e: any) => {
-        // e.preventDefault();
-        // e.stopPropagation();
-        // e.nativeEvent.stopImmediatePropagation();
-
         console.log('do something on click');
         // sorting
         // update state sorting
@@ -398,9 +404,12 @@ const useTable = ({ columns, data }: any) => {
             : 'asc';
         headers[i] = { ...column, sortOrder };
         setHeaders([...headers]);
-        setSorts(
+        setSortsState(
           uniqBy(
-            [{ accessor: column.accessor, sortOrder: sortOrder }, ...sorts],
+            [
+              { accessor: column.accessor, sortOrder: sortOrder },
+              ...sortsState,
+            ],
             'accessor'
           )
         );
@@ -410,24 +419,18 @@ const useTable = ({ columns, data }: any) => {
     }
 
     if (isFunction(column.filtering)) {
-      setFilter = (value: string) => {
+      setFilter = debounce((value: string) => {
         console.log('filter do something');
-        setFilters(
+        setFiltersState(
           uniqBy(
-            [{ accessor: column.accessor, filterValue: value }, ...filters],
+            [
+              { accessor: column.accessor, filterValue: value },
+              ...filtersState,
+            ],
             'accessor'
           )
-        );
-
-        // setFilters({
-        //   ...filter,
-        //   [column.accessor]: value,
-        // });
-
-        // headers[i] = { ...column, filterValue: value };
-        // setHeaders([...headers]);
-        // TODO separate filterValue for useEffect
-      };
+        )
+      }, 85);
     }
 
     console.log(
@@ -444,13 +447,17 @@ const useTable = ({ columns, data }: any) => {
         return colHeader;
       },
       sortOrder: column.sortOrder,
+      getSortOrder: () => {
+        const sort = find(sortsState, { accessor: column.accessor })
+        return sort ? sort.sortOrder : '';
+      },
       filterValue: column.filterValue,
       setFilter,
       renderFilter: isFunction(column.filtering)
         ? () => {
-            console.log('renderFilter', filters);
+            console.log('renderFilter', filtersState);
             return column.filtering({
-              filterValue: find(filters, { accessor: column.accessor })
+              filterValue: find(filtersState, { accessor: column.accessor })
                 ?.filterValue,
               setFilter,
             });
@@ -480,6 +487,8 @@ const useTable = ({ columns, data }: any) => {
   return {
     headers: resultHeaders,
     rows: resultRows,
+    sorts: sortsState,
+    filters: filtersState,
   };
 };
 
@@ -492,7 +501,13 @@ const TextFilter = ({ filterValue, setFilter }: any) => {
     setFilter(e.target.value);
   };
 
-  return <input value={filterValue || ''} onChange={changeHandler} onClick={clickHandler} />;
+  return (
+    <input
+      value={filterValue || ''}
+      onChange={changeHandler}
+      onClick={clickHandler}
+    />
+  );
 };
 
 function App() {
@@ -578,10 +593,26 @@ function App() {
   );
   const dataSample = useMemo(() => sampleResult.data, []);
 
-  const { headers, rows } = useTable({ columns, data: dataSample });
+  console.log('tableQuery', tableQuery);
+  const { headers, rows, sorts, filters } = useTable({
+    columns,
+    data: dataSample,
+    sorts: tableQuery.sorts,
+    filters: tableQuery.filters,
+  });
 
   console.log('headers', headers);
   console.log('rows', rows);
+
+  useEffect(() => {
+    // http://localhost:3000?sort_desc=application_date&sort_asc=year_of_experience&filter_position_applied=n&filter_status=a&filter_name=a
+
+    if (!isEmpty(sorts) || !isEmpty(filters)) {
+      const result = buildUrlParams(sorts, filters);
+      const newUrl = `${window.location.origin}${result ? `?${result}` : ''}`;
+      window.history.pushState(result, result, newUrl);
+    }
+  }, [sorts, filters]);
 
   return (
     <div className="App">
@@ -593,7 +624,7 @@ function App() {
               <tr>
                 {headers.map((column: any) => (
                   <th {...column.getHeaderProps()}>
-                    {column.render()} {column.sortOrder}{' '}
+                    {column.render()} {column.getSortOrder()}{' '}
                     {column.renderFilter && column.renderFilter()}
                   </th>
                 ))}
