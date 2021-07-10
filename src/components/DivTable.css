@@ -1,0 +1,90 @@
+.table {
+  border: 2px solid black;
+  width: 90%;
+}
+
+.header-container {
+  background: #ccc;
+}
+
+.headers {
+  display: flex;
+  flex-direction: row;
+}
+
+.header-column {
+  padding: 10px;
+  border-right: 1px solid black;
+}
+
+.header-column:last-child {
+  border-right: none;
+}
+
+.content-viewport {
+  width: 100%;
+  height: 600px;
+  overflow-y: auto;
+}
+
+.row {
+  height: 40px;
+  display: flex;
+  flex-direction: row;
+}
+
+.row.even {
+}
+
+
+.row.odd {
+  background: #eee;
+}
+
+.cell {
+  border-right: 1px solid black;
+}
+
+.cell:last-child {
+  border-right: none;
+}
+
+.header-column.name,
+.cell.name {
+  width: 100px;
+}
+
+.header-column.email,
+.cell.email {
+  width: 20%;
+}
+
+.header-column.birth_date,
+.cell.birth_date {
+  width: 70px;
+}
+
+.header-column.year_of_experience,
+.cell.year_of_experience {
+  width: 70px;
+}
+
+.header-column.position_applied,
+.cell.position_applied {
+  width: 70px;
+}
+
+.header-column.application_date,
+.cell.application_date {
+  /* width: 70px; */
+  flex: 1 1 auto;
+}
+
+.header-column.status,
+.cell.status {
+  width: 70px;
+}
+
+.filter-input {
+  width: 60px;
+}
