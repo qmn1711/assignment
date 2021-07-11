@@ -2,60 +2,7 @@ import { useEffect } from 'react';
 
 import useTable from '../hooks/useTable';
 import VirtualScroller from './VirtualScroller';
-import {
-  Column,
-  Filter,
-  FilteringProps,
-  Sort,
-  SortOrder,
-} from '../hooks/useTable.types';
-
-import './DivTable.css';
-
-export const TextFilter = ({ filterValue, setFilter }: FilteringProps) => {
-  const clickHandler = (e: any) => {
-    e.stopPropagation();
-  };
-
-  const changeHandler = (e: any) => {
-    setFilter(e.target.value);
-  };
-
-  return (
-    <input
-      className="filter-input no-focusborder"
-      placeholder="search..."
-      value={filterValue || ''}
-      onChange={changeHandler}
-      onClick={clickHandler}
-    />
-  );
-};
-
-interface SelectProps<T> extends FilteringProps {
-  data: T[];
-}
-export const Select = <T extends { value: string; text: string }>({
-  data,
-  filterValue,
-  setFilter,
-}: SelectProps<T>) => {
-  const changeHandler = ({ target: { value } }: any) => setFilter(value);
-
-  return (
-    <select
-      className="filter-select no-focusborder"
-      value={filterValue}
-      onChange={changeHandler}
-    >
-      {data.map(({ value, text }: T, i: number) => (
-        <option key={i} value={value}>
-          {text}
-        </option>
-      ))}
-    </select>
-  );
-};
+import { Column, Filter, Sort, SortOrder } from '../hooks/useTable.types';
 
 interface DivTableProps<T> {
   columns: Column<T>[];
@@ -67,7 +14,7 @@ interface DivTableProps<T> {
   onTableQueryChange: (sorts: Sort[], filter: Filter[]) => void;
 }
 
-export function DivTable<T>({
+export default function DivTable<T>({
   columns,
   data,
   tableQuery,

@@ -1,3 +1,7 @@
+.error {
+  color: red;
+}
+
 .table {
   border: 2px solid black;
   /* width: 90%; */
@@ -65,7 +69,7 @@
 
 .header-column.name,
 .cell.name {
-  width: 200px;
+  width: 300px;
 }
 
 .header-column.email,
@@ -75,7 +79,7 @@
 
 .header-column.birth_date,
 .cell.birth_date {
-  width: 70px;
+  width: 100px;
 }
 
 .header-column.year_of_experience,
@@ -100,21 +104,9 @@
   flex: 1 1 auto;
 }
 
-.filter-input {
-  margin-top: 5px;
-  width: 100px;
-  border-radius: 9px;
-}
-
 .filter-select {
   margin-top: 5px;
   border-radius: 9px;
-}
-
-.no-focusborder:focus {
-  outline-style: none;
-  box-shadow: none;
-  border-color: transparent;
 }
 
 .arrow {

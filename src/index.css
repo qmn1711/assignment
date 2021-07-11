@@ -11,3 +11,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.no-focusborder:focus {
+  outline-style: none;
+  box-shadow: none;
+  border-color: transparent;
+}
