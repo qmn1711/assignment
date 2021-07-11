@@ -1,5 +1,7 @@
 import isEmpty from 'lodash/isEmpty';
 
+import { Filter, Sort } from './hooks/useTable.types';
+
 export const SORT_PREFIX = 'sort_';
 export const FILTER_PREFIX = 'filter_';
 
@@ -13,7 +15,7 @@ export function capitalizeFirstLetter(text: string) {
   return text ? text.charAt(0).toUpperCase() + text.slice(1) : text;
 }
 
-export function buildUrlParams(sorts: any[], filters: any[]) {
+export function buildUrlParams(sorts: Sort[], filters: Filter[]) {
   let params: string[] = [];
 
   if (!isEmpty(sorts)) {
@@ -36,12 +38,9 @@ export function buildUrlParams(sorts: any[], filters: any[]) {
 }
 
 export function buildTableQueryFromUrlParams(urlParams: string) {
-  // let sorts: any[] = [];
-  // let filters: any[] = [];
-
   let result = {
-    sorts: [] as any[],
-    filters: [] as any[],
+    sorts: [] as Sort[],
+    filters: [] as Filter[],
   };
 
   if (urlParams) {

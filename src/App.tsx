@@ -9,6 +9,7 @@ import {
 import { DivTable, Select, TextFilter } from './components/DivTable';
 
 import './App.css';
+import { Filter, FilteringProps, Sort } from './hooks/useTable.types';
 
 const CANDIDATES_ENDPOINT =
   'http://personio-fe-test.herokuapp.com/api/v1/candidates';
@@ -42,7 +43,7 @@ const getColumns = () => {
     {
       header: 'Name',
       accessor: 'name',
-      filtering: (props: any) => {
+      filtering: (props: FilteringProps) => {
         return <TextFilter {...props} />;
       },
     },
@@ -71,7 +72,7 @@ const getColumns = () => {
       header: 'Position applied',
       accessor: 'position_applied',
       sorting: true,
-      filtering: (props: any) => {
+      filtering: (props: FilteringProps) => {
         return <TextFilter {...props} />;
       },
     },
@@ -86,14 +87,14 @@ const getColumns = () => {
       render: (value: string) => {
         return capitalizeFirstLetter(value);
       },
-      filtering: (props: any) => {
+      filtering: (props: FilteringProps) => {
         return <Select data={StatusData} {...props} />;
       },
     },
   ];
 };
 
-const changeUrl = (sorts: any, filters: any) => {
+const changeUrl = (sorts: Sort[], filters: Filter[]) => {
   const result = buildUrlParams(sorts, filters);
   const newUrl = `${window.location.origin}${result ? `?${result}` : ''}`;
   window.history.pushState(result, result, newUrl);
@@ -110,7 +111,7 @@ const Loader = () => {
   );
 };
 
-const ErrorMsg = ({ errorMsg }: any) => {
+const ErrorMsg = ({ errorMsg }: { errorMsg: string }) => {
   return (
     <div className="message error">{`${errorMsg} - Please try again!`}</div>
   );

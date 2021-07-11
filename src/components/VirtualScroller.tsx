@@ -1,9 +1,44 @@
 import React, { useEffect, useRef, useState } from 'react';
 import range from 'lodash/range';
 
-const setInitialState = (settings: any) => {
-  const { itemHeight, amount, tolerance, minIndex, maxIndex, startIndex } =
-    settings;
+interface Settings {
+  itemHeight: number;
+  amount: number;
+  tolerance: number;
+  minIndex: number;
+  maxIndex: number;
+  startIndex: number;
+}
+interface Props {
+  className: string;
+  itemHeight: number;
+  amount: number;
+  maxIndex: number;
+  children: ({ index }: { index: number }) => void;
+}
+
+const defaultSettings: Settings = {
+  itemHeight: 0,
+  amount: 0,
+  tolerance: 0,
+  minIndex: 0,
+  maxIndex: 0,
+  startIndex: 1,
+};
+
+const setInitialState = (
+  itemHeight: number,
+  amount: number,
+  maxIndex: number
+) => {
+  const settings: Settings = {
+    ...defaultSettings,
+    itemHeight,
+    amount,
+    maxIndex,
+  };
+  const { tolerance, minIndex, startIndex } = settings;
+
   const viewportHeight = amount * itemHeight;
   const totalHeight = (maxIndex - minIndex + 1) * itemHeight;
   const toleranceHeight = tolerance * itemHeight;
@@ -27,17 +62,25 @@ const setInitialState = (settings: any) => {
   };
 };
 
-function VirtualScroller({ settings, children, className }: any) {
-  const [state, setState] = useState(() => setInitialState(settings));
+function VirtualScroller({
+  itemHeight,
+  amount,
+  maxIndex,
+  children,
+  className,
+}: Props) {
+  const [state, setState] = useState(() =>
+    setInitialState(itemHeight, amount, maxIndex)
+  );
   const viewportElement = useRef<HTMLDivElement>(null);
 
-  const calculate = (settings: any, scrollTop: number) => {
+  const calculate = (currentState: any, scrollTop: number) => {
     const {
       totalHeight,
       toleranceHeight,
       bufferedItems,
       settings: { itemHeight, minIndex },
-    } = settings;
+    } = currentState;
     const index =
       minIndex + Math.floor((scrollTop - toleranceHeight) / itemHeight);
     const data: any = range(index, index + bufferedItems);
@@ -48,12 +91,12 @@ function VirtualScroller({ settings, children, className }: any) {
       0
     );
 
-    return { 
+    return {
       topPaddingHeight,
       bottomPaddingHeight,
-      data
-    }
-  }
+      data,
+    };
+  };
 
   const runScroller = ({ target: { scrollTop } }: any) => {
     const result = calculate(state, scrollTop);
@@ -73,15 +116,15 @@ function VirtualScroller({ settings, children, className }: any) {
       }
     }
   }, []); // eslint-disable-line
-  
+
   useEffect(() => {
-    let newSettings = setInitialState(settings);
-    newSettings = { ...newSettings, ...calculate(newSettings, 0) };
-    setState(newSettings);
+    let newState = setInitialState(itemHeight, amount, maxIndex);
+    newState = { ...newState, ...calculate(newState, 0) };
+    setState(newState);
     if (viewportElement.current) {
-      viewportElement.current.scrollTop = newSettings.initialPosition;
+      viewportElement.current.scrollTop = newState.initialPosition;
     }
-  }, [settings]);
+  }, [itemHeight, amount, maxIndex]);
 
   const { viewportHeight, topPaddingHeight, bottomPaddingHeight, data } = state;
 
@@ -94,8 +137,7 @@ function VirtualScroller({ settings, children, className }: any) {
     >
       <div style={{ height: topPaddingHeight }} />
       {data.map((index: number) => {
-
-        return children({index});
+        return children({ index });
       })}
       <div style={{ height: bottomPaddingHeight }} />
     </div>

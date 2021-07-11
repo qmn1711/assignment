@@ -2,7 +2,13 @@ import { useEffect } from 'react';
 
 import useTable from '../hooks/useTable';
 import VirtualScroller from './VirtualScroller';
-import { Column, Filter, FilteringProps, Sort, SortOrder } from '../hooks/useTable.types';
+import {
+  Column,
+  Filter,
+  FilteringProps,
+  Sort,
+  SortOrder,
+} from '../hooks/useTable.types';
 
 import './DivTable.css';
 
@@ -29,7 +35,7 @@ export const TextFilter = ({ filterValue, setFilter }: FilteringProps) => {
 interface SelectProps<T> extends FilteringProps {
   data: T[];
 }
-export const Select = <T extends { value: string, text: string }>({
+export const Select = <T extends { value: string; text: string }>({
   data,
   filterValue,
   setFilter,
@@ -74,15 +80,6 @@ export function DivTable<T>({
     filters: tableQuery.filters,
   });
 
-  const settings = {
-    itemHeight: 40,
-    amount: 10,
-    tolerance: 0,
-    minIndex: 0,
-    maxIndex: rows.length - 1,
-    startIndex: 1,
-  };
-
   const renderSortOrder = (sortOrder: SortOrder) => {
     if (!sortOrder) return null;
 
@@ -112,8 +109,13 @@ export function DivTable<T>({
         </div>
       </div>
       <div>
-        <VirtualScroller className="content-viewport" settings={settings}>
-          {({ index }: any) => {
+        <VirtualScroller
+          className="content-viewport"
+          itemHeight={40}
+          amount={10}
+          maxIndex={rows.length - 1}
+        >
+          {({ index }) => {
             const row = rows[index];
             const styleClass = index % 2 ? 'even' : 'odd';
 
