@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import orderBy from 'lodash/orderBy';
 import filter from 'lodash/filter';
@@ -7,7 +7,51 @@ import isFunction from 'lodash/isFunction';
 import find from 'lodash/find';
 import debounce from 'lodash/debounce';
 
-const useTable = ({ columns, data, sorts, filters }: any) => {
+const filterData = (data: any[], filters: any[]) => {
+  let result = data;
+
+  if (!isEmpty(filters)) {
+    result = filter(data, (row: any) => {
+      let match = false;
+
+      for (let i = 0; i < filters.length; i++) {
+        const value = row[filters[i].accessor];
+        const filterValue = filters[i].filterValue;
+
+        switch (typeof value) {
+          case 'string':
+            match = value.toLowerCase().includes(filterValue.toLowerCase());
+            break;
+          case 'number':
+            match = value === parseInt(filterValue);
+            break;
+        }
+
+        if (match === false) {
+          break;
+        }
+      }
+
+      return match;
+    });
+  }
+
+  return result;
+};
+
+const sortData = (data: any[], sorts: any[]) => {
+  let result = data;
+
+  if (!isEmpty(sorts)) {
+    const fields = sorts.map((sort) => sort.accessor);
+    const sortOrders = sorts.map((sort) => sort.sortOrder);
+    result = orderBy(data, fields, sortOrders);
+  }
+
+  return result;
+};
+
+function useTable({ columns, data, sorts, filters }: any) {
   const [sortsState, setSortsState] = useState<any[]>(() =>
     isEmpty(sorts) ? [] : sorts
   );
@@ -15,57 +59,23 @@ const useTable = ({ columns, data, sorts, filters }: any) => {
     isEmpty(filters) ? [] : filters
   );
   const [headers, setHeaders] = useState<any[]>(columns);
-  const [rows, setRows] = useState<any[]>(data);
 
-  useEffect(() => {
-    if (!isEmpty(sortsState)) {
-      const fields = sortsState.map((sort) => sort.accessor);
-      const sortOrders = sortsState.map((sort) => sort.sortOrder);
-      setRows((rows) => orderBy(rows, fields, sortOrders));
-    }
-  }, [sortsState]);
-
-  useEffect(() => {
-    if (!isEmpty(filtersState)) {
-      setRows(
-        filter(data, (row: any) => {
-          let match = false;
-
-          for (let i = 0; i < filtersState.length; i++) {
-            const value = row[filtersState[i].accessor];
-            const filterValue = filtersState[i].filterValue;
-
-            switch (typeof value) {
-              case 'string':
-                match = value.toLowerCase().includes(filterValue.toLowerCase());
-                break;
-              case 'number':
-                match = value === parseInt(filterValue);
-                break;
-            }
-
-            if (match === false) {
-              break;
-            }
-          }
-
-          return match;
-        })
-      );
-    }
-  }, [filtersState, data]);
-
+  const filteredRows = useMemo(
+    () => filterData(data, filtersState),
+    [data, filtersState]
+  );
+  const rows = useMemo(
+    () => sortData(filteredRows, sortsState),
+    [filteredRows, sortsState]
+  );
   const accessors = columns.map((column: any) => column.accessor); // TODO use reduce for only one loop
   const resultHeaders = headers.map((column: any, i: number) => {
     const colHeader = column.header;
     const headerProps: any = {};
     let setFilter: any;
 
-    // TODO adapt the props from url query
     if (column.sorting) {
       headerProps.onClick = (e: any) => {
-        // sorting
-        // update state sorting
         const sortOrder =
           isEmpty(column.sortOrder) || column.sortOrder === 'asc'
             ? 'desc'
@@ -128,6 +138,7 @@ const useTable = ({ columns, data, sorts, filters }: any) => {
         : undefined,
     };
   });
+
   const resultRows = rows.map((item: any) => {
     const cells = Object.keys(item)
       .filter((key) => accessors.includes(key))
@@ -160,6 +171,6 @@ const useTable = ({ columns, data, sorts, filters }: any) => {
     sorts: sortsState,
     filters: filtersState,
   };
-};
+}
 
 export default useTable;
