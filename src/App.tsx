@@ -99,12 +99,21 @@ const changeUrl = (sorts: any, filters: any) => {
   window.history.pushState(result, result, newUrl);
 };
 
-const Loading = () => {
-  return <div className="message loading">Loading...</div>;
+const Loader = () => {
+  return (
+    <div className="lds-ellipsis loading-applications">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  );
 };
 
 const ErrorMsg = ({ errorMsg }: any) => {
-  return <div className="message error">{`${errorMsg} - Please try again!`}</div>;
+  return (
+    <div className="message error">{`${errorMsg} - Please try again!`}</div>
+  );
 };
 
 function App() {
@@ -164,7 +173,7 @@ function App() {
           <h3>Applications</h3>
         </div>
 
-        {isLoading ? <Loading /> : renderContent()}
+        {isLoading ? <Loader /> : renderContent()}
       </div>
     </div>
   );
