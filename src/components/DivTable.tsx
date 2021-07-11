@@ -2,10 +2,11 @@ import { useEffect } from 'react';
 
 import useTable from '../hooks/useTable';
 import VirtualScroller from './VirtualScroller';
+import { Column, Filter, FilteringProps, Sort, SortOrder } from '../hooks/useTable.types';
 
 import './DivTable.css';
 
-export const TextFilter = ({ filterValue, setFilter }: any) => {
+export const TextFilter = ({ filterValue, setFilter }: FilteringProps) => {
   const clickHandler = (e: any) => {
     e.stopPropagation();
   };
@@ -25,7 +26,14 @@ export const TextFilter = ({ filterValue, setFilter }: any) => {
   );
 };
 
-export const Select = ({ data, filterValue, setFilter }: any) => {
+interface SelectProps<T> extends FilteringProps {
+  data: T[];
+}
+export const Select = <T extends { value: string, text: string }>({
+  data,
+  filterValue,
+  setFilter,
+}: SelectProps<T>) => {
   const changeHandler = ({ target: { value } }: any) => setFilter(value);
 
   return (
@@ -34,7 +42,7 @@ export const Select = ({ data, filterValue, setFilter }: any) => {
       value={filterValue}
       onChange={changeHandler}
     >
-      {data.map(({ value, text }: any, i: number) => (
+      {data.map(({ value, text }: T, i: number) => (
         <option key={i} value={value}>
           {text}
         </option>
@@ -43,12 +51,22 @@ export const Select = ({ data, filterValue, setFilter }: any) => {
   );
 };
 
-export function DivTable({
+interface DivTableProps<T> {
+  columns: Column<T>[];
+  data: T[];
+  tableQuery: {
+    sorts: Sort[];
+    filters: Filter[];
+  };
+  onTableQueryChange: (sorts: Sort[], filter: Filter[]) => void;
+}
+
+export function DivTable<T>({
   columns,
   data,
   tableQuery,
   onTableQueryChange,
-}: any) {
+}: DivTableProps<T>) {
   const { headers, rows, sorts, filters } = useTable({
     columns,
     data,
@@ -65,7 +83,7 @@ export function DivTable({
     startIndex: 1,
   };
 
-  const renderSortOrder = (sortOrder: string) => {
+  const renderSortOrder = (sortOrder: SortOrder) => {
     if (!sortOrder) return null;
 
     return <i className={`arrow ${sortOrder === 'asc' ? 'down' : 'up'}`} />;
@@ -79,7 +97,7 @@ export function DivTable({
     <div className="table">
       <div className="header-container">
         <div className="headers">
-          {headers.map((column: any, i: number) => (
+          {headers.map((column, i) => (
             <div
               key={i}
               className={column.getClassName('header-column')}
@@ -94,17 +112,14 @@ export function DivTable({
         </div>
       </div>
       <div>
-        <VirtualScroller
-          className="content-viewport"
-          settings={settings}
-        >
+        <VirtualScroller className="content-viewport" settings={settings}>
           {({ index }: any) => {
             const row = rows[index];
             const styleClass = index % 2 ? 'even' : 'odd';
 
             return (
               <div className={`row ${styleClass}`} key={index}>
-                {row?.cells.map((cell: any, j: number) => {
+                {row?.cells.map((cell, j) => {
                   return (
                     <div className={cell.getClassName('cell')} key={j}>
                       {cell.render()}

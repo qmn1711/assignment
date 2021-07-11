@@ -7,7 +7,16 @@ import isFunction from 'lodash/isFunction';
 import find from 'lodash/find';
 import debounce from 'lodash/debounce';
 
-const filterData = (data: any[], filters: any[]) => {
+import {
+  Filter,
+  ReturnTable,
+  Sort,
+  TableColumn,
+  TableHeaderProps,
+  TableProps,
+} from './useTable.types';
+
+const filterData = <T>(data: T[], filters: Filter[]): T[] => {
   let result = data;
 
   if (!isEmpty(filters)) {
@@ -39,43 +48,48 @@ const filterData = (data: any[], filters: any[]) => {
   return result;
 };
 
-const sortData = (data: any[], sorts: any[]) => {
+const sortData = <T>(data: T[], sorts: Sort[]): T[] => {
   let result = data;
 
   if (!isEmpty(sorts)) {
     const fields = sorts.map((sort) => sort.accessor);
-    const sortOrders = sorts.map((sort) => sort.sortOrder);
+    const sortOrders: any = sorts.map((sort) => sort.sortOrder);
     result = orderBy(data, fields, sortOrders);
   }
 
   return result;
 };
 
-function useTable({ columns, data, sorts, filters }: any) {
-  const [sortsState, setSortsState] = useState<any[]>(() =>
+function useTable<T extends { [key:string]: any }>({
+  columns,
+  data,
+  sorts,
+  filters,
+}: TableProps<T>): ReturnTable {
+  const [sortsState, setSortsState] = useState<Sort[]>(() =>
     isEmpty(sorts) ? [] : sorts
   );
-  const [filtersState, setFiltersState] = useState<any>(() =>
+  const [filtersState, setFiltersState] = useState<Filter[]>(() =>
     isEmpty(filters) ? [] : filters
   );
-  const [headers, setHeaders] = useState<any[]>(columns);
+  const [headers, setHeaders] = useState<TableColumn<T>[]>(columns);
 
-  const filteredRows = useMemo(
+  const filteredRows = useMemo<T[]>(
     () => filterData(data, filtersState),
     [data, filtersState]
   );
-  const rows = useMemo(
+  const rows = useMemo<T[]>(
     () => sortData(filteredRows, sortsState),
     [filteredRows, sortsState]
   );
-  const accessors = columns.map((column: any) => column.accessor); // TODO use reduce for only one loop
-  const resultHeaders = headers.map((column: any, i: number) => {
+  const accessors = columns.map((column) => column.accessor); // TODO use reduce for only one loop
+  const resultHeaders = headers.map((column, i) => {
     const colHeader = column.header;
-    const headerProps: any = {};
+    let headerProps: TableHeaderProps;
     let setFilter: any;
 
     if (column.sorting) {
-      headerProps.onClick = (e: any) => {
+      const onClick = (e: any) => {
         const sortOrder =
           isEmpty(column.sortOrder) || column.sortOrder === 'asc'
             ? 'desc'
@@ -93,7 +107,10 @@ function useTable({ columns, data, sorts, filters }: any) {
         );
       };
 
-      headerProps.style = { cursor: 'pointer' };
+      headerProps = {
+        onClick,
+        style: { cursor: 'pointer' },
+      };
     }
 
     if (isFunction(column.filtering)) {
@@ -127,19 +144,20 @@ function useTable({ columns, data, sorts, filters }: any) {
       },
       filterValue: column.filterValue,
       setFilter,
-      renderFilter: isFunction(column.filtering)
-        ? () => {
-            return column.filtering({
-              filterValue: find(filtersState, { accessor: column.accessor })
-                ?.filterValue,
-              setFilter,
-            });
-          }
-        : undefined,
+      renderFilter:
+        column.filtering && isFunction(column.filtering)
+          ? () => {
+              return column.filtering?.({
+                filterValue: find(filtersState, { accessor: column.accessor })
+                  ?.filterValue,
+                setFilter,
+              });
+            }
+          : undefined,
     };
   });
 
-  const resultRows = rows.map((item: any) => {
+  const resultRows = rows.map((item) => {
     const cells = Object.keys(item)
       .filter((key) => accessors.includes(key))
       .map((key) => {
@@ -150,8 +168,6 @@ function useTable({ columns, data, sorts, filters }: any) {
           },
           render: () => {
             const column = find(columns, { accessor: key });
-            if (column && isFunction(column.render)) {
-            }
 
             return column && isFunction(column.render)
               ? column.render(item[key])
