@@ -11,13 +11,12 @@ import { Filter, FilteringProps, Sort } from '../hooks/useTable.types';
 import TextFilter from './TextFilter';
 import SelectFilter from './SelectFilter';
 import Loader from './Loader';
+import { addTableQueryToColumns } from '../hooks/useTable';
 
 import './Candidates.css';
 
 const CANDIDATES_ENDPOINT =
   'http://personio-fe-test.herokuapp.com/api/v1/candidates';
-
-const tableQuery = buildTableQueryFromUrlParams(window.location.search);
 
 export const StatusData = [
   {
@@ -43,7 +42,7 @@ const getColumns = () => {
     {
       header: 'Name',
       accessor: 'name',
-      filtering: (props: FilteringProps) => {
+      filter: (props: FilteringProps) => {
         return <TextFilter {...props} />;
       },
     },
@@ -66,20 +65,20 @@ const getColumns = () => {
     {
       header: 'Years of Experience',
       accessor: 'year_of_experience',
-      sorting: true,
+      sort: true,
     },
     {
       header: 'Position applied',
       accessor: 'position_applied',
-      sorting: true,
-      filtering: (props: FilteringProps) => {
+      sort: true,
+      filter: (props: FilteringProps) => {
         return <TextFilter {...props} />;
       },
     },
     {
       header: 'Applied',
       accessor: 'application_date',
-      sorting: true,
+      sort: true,
     },
     {
       header: 'Status',
@@ -87,9 +86,13 @@ const getColumns = () => {
       render: (value: string) => {
         return capitalizeFirstLetter(value);
       },
-      filtering: (props: FilteringProps) => {
+      filter: (props: FilteringProps) => {
         return (
-          <SelectFilter className="filter-select" data={StatusData} {...props} />
+          <SelectFilter
+            className="filter-select"
+            data={StatusData}
+            {...props}
+          />
         );
       },
     },
@@ -112,6 +115,15 @@ function Candidates() {
   const [isLoading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
+
+  const tableQuery = useMemo(
+    () => buildTableQueryFromUrlParams(window.location.search),
+    []
+  );
+  const columns = useMemo(
+    () => addTableQueryToColumns(getColumns(), tableQuery),
+    [tableQuery]
+  );
 
   useEffect(() => {
     async function fetchData() {
@@ -142,18 +154,9 @@ function Candidates() {
     return errorMsg ? (
       <ErrorMsg errorMsg={errorMsg} />
     ) : (
-      <DivTable
-        columns={columns}
-        data={data}
-        tableQuery={tableQuery}
-        onTableQueryChange={changeUrl}
-      />
+      <DivTable columns={columns} data={data} onTableQueryChange={changeUrl} />
     );
   };
-
-  const columns = useMemo(getColumns, []);
-
-  console.log('tableQuery', tableQuery);
 
   return isLoading ? <Loader /> : renderContent();
 }

@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react-hooks';
-import useTable from './useTable';
+import useTable, { addTableQueryToColumns } from './useTable';
 
 const Columns = [
   { header: 'field1', accessor: 'field1' },
@@ -12,6 +12,8 @@ const Data = [
   { field1: 'field1 B', field2: 'field2 C', field3: 'field3 C' },
   { field1: 'field1 B', field2: 'field2 D', field3: 'field3 D' },
 ];
+
+const DefaultHeaderColumnStyle = { cursor: 'pointer' };
 
 test('should return table output correctly', () => {
   const simpleInput = {
@@ -53,19 +55,22 @@ test('should return table output correctly', () => {
 
 describe('with sorts', () => {
   test('should return table output correctly with sorts 1', () => {
+    const columns = addTableQueryToColumns(Columns, {
+      sorts: [{ accessor: Columns[0].accessor, sort: 'desc' }],
+    });
+
     const simpleInput = {
-      columns: Columns,
+      columns,
       data: Data,
-      sorts: [{ accessor: Columns[0].accessor, sortOrder: 'desc' }],
-      filters: [],
     };
 
     const { result } = renderHook(() => useTable(simpleInput));
 
-    // expect(result.current.headers.length).toBe(3);
     const firstColumn = result.current.headers[0];
-    console.log('firstColumn.getHeaderProps()', firstColumn.getHeaderProps());
-    expect(firstColumn.getHeaderProps()).toStrictEqual({});
+    expect(firstColumn.getHeaderProps()).not.toStrictEqual({});
+    expect(typeof firstColumn.getHeaderProps().onClick).toBe('function');
+    expect(firstColumn.getHeaderProps().style).toMatchObject(DefaultHeaderColumnStyle);
+
     // const columnClassName = 'first-column';
     // expect(firstColumn.getClassName(columnClassName)).toBe(
     //   `${columnClassName} ${Columns[0].accessor}`
@@ -98,9 +103,7 @@ describe('with sorts', () => {
     //   sorts: [],
     //   filters: [],
     // };
-
     // const { result } = renderHook(() => useTable(simpleInput));
-
     // expect(result.current.headers.length).toBe(3);
     // const firstColumn = result.current.headers[0];
     // expect(firstColumn.getHeaderProps()).toStrictEqual({});
@@ -113,7 +116,6 @@ describe('with sorts', () => {
     // expect(firstColumn.filterValue).toBe(undefined);
     // expect(firstColumn.setFilter).toBe(undefined);
     // expect(firstColumn.renderFilter?.()).toBe(undefined);
-
     // expect(result.current.rows.length).toBe(2);
     // const firstRow = result.current.rows[0];
     // expect(firstRow.cells.length).toBe(3);
@@ -124,7 +126,6 @@ describe('with sorts', () => {
     //   `${cellClassName} ${Columns[0].accessor}`
     // );
     // expect(firstCell.render()).toBe(Data[0].field1);
-
     // expect(result.current.sorts.length).toBe(0);
     // expect(result.current.filters.length).toBe(0);
   });

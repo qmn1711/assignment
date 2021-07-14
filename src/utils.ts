@@ -1,6 +1,6 @@
 import isEmpty from 'lodash/isEmpty';
 
-import { Filter, Sort } from './hooks/useTable.types';
+import { Filter, Sort, SortOrder, TableQuery } from './hooks/useTable.types';
 
 export const SORT_PREFIX = 'sort_';
 export const FILTER_PREFIX = 'filter_';
@@ -20,7 +20,7 @@ export function buildUrlParams(sorts: Sort[], filters: Filter[]) {
 
   if (!isEmpty(sorts)) {
     params = sorts.map((sort) => {
-      return `${SORT_PREFIX}${sort.sortOrder}=${sort.accessor}`;
+      return `${SORT_PREFIX}${sort.sort}=${sort.accessor}`;
     });
   }
 
@@ -37,7 +37,7 @@ export function buildUrlParams(sorts: Sort[], filters: Filter[]) {
   return isEmpty(params) ? '' : params.join('&');
 }
 
-export function buildTableQueryFromUrlParams(urlParams: string) {
+export function buildTableQueryFromUrlParams(urlParams: string): TableQuery {
   let result = {
     sorts: [] as Sort[],
     filters: [] as Filter[],
@@ -51,7 +51,9 @@ export function buildTableQueryFromUrlParams(urlParams: string) {
         if (current.startsWith(SORT_PREFIX)) {
           const [sort, accessor] = current.split('=');
           const sortOrder = sort.split(SORT_PREFIX)[1];
-          accum.sorts.push({ accessor, sortOrder });
+          if (['asc', 'desc'].includes(sortOrder)) {
+            accum.sorts.push({ accessor, sort: sortOrder as SortOrder });
+          }
         } else if (current.startsWith(FILTER_PREFIX)) {
           const [filter, filterValue] = current.split('=');
           const accessor = filter.split(FILTER_PREFIX)[1];

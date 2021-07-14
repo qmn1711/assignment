@@ -1,7 +1,6 @@
 import { ReactNode, MouseEvent, CSSProperties } from 'react';
 
-// type SortOrder = 'asc' | 'desc' | '' | undefined; // TODO
-export type SortOrder = string | undefined;
+export type SortOrder = 'asc' | 'desc' | undefined;
 
 export type SetFilter = (value: string) => void;
 
@@ -37,29 +36,33 @@ export interface TableRow {
 export interface Column<T> {
   header: string;
   accessor: string;
-  sorting?: boolean;
-  filtering?: (props: FilteringProps) => ReactNode;
+  sort?: SortOrder | boolean;
+  filter?: (props: FilteringProps) => ReactNode;
+  filterValue?: string | undefined;
   render?: (props: any) => ReactNode;
 }
 
 export interface TableColumn<T> extends Column<T> {
   sortOrder?: SortOrder;
-  filterValue?: string | undefined;
+  // filterValue?: string | undefined;
 }
 export interface Sort {
   accessor: string;
-  sortOrder: SortOrder;
+  sort: SortOrder;
 }
 
 export interface Filter {
   accessor: string;
   filterValue: string;
 }
+
+export interface TableQuery {
+  sorts?: Sort[];
+  filters?: Filter[];
+}
 export interface TableProps<T> {
   columns: TableColumn<T>[];
   data: T[];
-  sorts: Sort[];
-  filters: Filter[];
 }
 
 export interface ReturnTable {

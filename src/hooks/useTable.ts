@@ -2,21 +2,58 @@ import { useMemo, useState } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import orderBy from 'lodash/orderBy';
 import filter from 'lodash/filter';
-import uniqBy from 'lodash/uniqBy';
 import isFunction from 'lodash/isFunction';
 import find from 'lodash/find';
 import debounce from 'lodash/debounce';
 
 import {
+  Column,
   Filter,
   ReturnTable,
   Sort,
+  SortOrder,
   TableColumn,
   TableHeaderProps,
   TableProps,
+  TableQuery,
 } from './useTable.types';
 
-const filterData = <T>(data: T[], filters: Filter[]): T[] => {
+const getSortOrder = (sortOrder: SortOrder | boolean) => {
+  let result = sortOrder;
+  if (typeof result === 'boolean') {
+    result = undefined;
+  }
+
+  return result;
+};
+
+export const addTableQueryToColumns = <T>(
+  columns: Column<T>[],
+  tableQuery: TableQuery
+): Column<T>[] => {
+  if (
+    isEmpty(columns) ||
+    isEmpty(tableQuery) ||
+    (isEmpty(tableQuery.sorts) && isEmpty(tableQuery.filters))
+  )
+    return columns;
+
+  return columns.map((column) => {
+    const sort = find(tableQuery.sorts, { accessor: column.accessor });
+    const filter = find(tableQuery.filters, { accessor: column.accessor });
+
+    return {
+      ...column,
+      sort: sort?.sort,
+      filterValue: filter?.filterValue,
+    };
+  });
+};
+
+const filterData = <T>(data: T[], columns: Column<T>[]): T[] => {
+  const filters = columns.filter(
+    (column) => column.filter && column.filterValue
+  );
   let result = data;
 
   if (!isEmpty(filters)) {
@@ -25,7 +62,7 @@ const filterData = <T>(data: T[], filters: Filter[]): T[] => {
 
       for (let i = 0; i < filters.length; i++) {
         const value = row[filters[i].accessor];
-        const filterValue = filters[i].filterValue;
+        const filterValue = filters[i].filterValue as string;
 
         switch (typeof value) {
           case 'string':
@@ -48,39 +85,70 @@ const filterData = <T>(data: T[], filters: Filter[]): T[] => {
   return result;
 };
 
-const sortData = <T>(data: T[], sorts: Sort[]): T[] => {
+const sortData = <T>(data: T[], columns: Column<T>[]): T[] => {
   let result = data;
 
-  if (!isEmpty(sorts)) {
-    const fields = sorts.map((sort) => sort.accessor);
-    const sortOrders: any = sorts.map((sort) => sort.sortOrder);
+  if (!isEmpty(columns)) {
+    const { fields, sortOrders } = columns
+      .filter((column) => !isEmpty(column.sort))
+      .reduce(
+        (accum, currentValue) => {
+          accum.fields.push(currentValue.accessor);
+          accum.sortOrders.push(currentValue.sort);
+          return accum;
+        },
+        { fields: [] as string[], sortOrders: [] as any[] }
+      );
     result = orderBy(data, fields, sortOrders);
   }
 
   return result;
 };
 
-function useTable<T extends { [key:string]: any }>({
+const getFilters = <T>(columns: TableColumn<T>[]): Filter[] => {
+  let result: Filter[] = [];
+
+  if (!isEmpty(columns)) {
+    result = filter(
+      columns,
+      (column) => !!column.filter && !!column.filterValue
+    ).map((column) => ({
+      accessor: column.accessor,
+      filterValue: column.filterValue as string,
+    }));
+  }
+
+  return result;
+};
+
+const getSorts = <T>(columns: TableColumn<T>[]): Sort[] => {
+  let result: Sort[] = [];
+
+  if (!isEmpty(columns)) {
+    result = filter(columns, (column) => !isEmpty(column.sort)).map(
+      (column) => ({
+        accessor: column.accessor,
+        sort: getSortOrder(column.sort),
+      })
+    );
+  }
+
+  return result;
+};
+
+function useTable<T extends { [key: string]: any }>({
   columns,
   data,
-  sorts,
-  filters,
 }: TableProps<T>): ReturnTable {
-  const [sortsState, setSortsState] = useState<Sort[]>(() =>
-    isEmpty(sorts) ? [] : sorts
-  );
-  const [filtersState, setFiltersState] = useState<Filter[]>(() =>
-    isEmpty(filters) ? [] : filters
-  );
   const [headers, setHeaders] = useState<TableColumn<T>[]>(columns);
 
   const filteredRows = useMemo<T[]>(
-    () => filterData(data, filtersState),
-    [data, filtersState]
+    () => filterData(data, headers),
+    [data, headers]
   );
   const rows = useMemo<T[]>(
-    () => sortData(filteredRows, sortsState),
-    [filteredRows, sortsState]
+    () => sortData(filteredRows, headers),
+    [filteredRows, headers]
   );
   const accessors = columns.map((column) => column.accessor);
   const resultHeaders = headers.map((column, i) => {
@@ -88,23 +156,12 @@ function useTable<T extends { [key:string]: any }>({
     let headerProps: TableHeaderProps;
     let setFilter: any;
 
-    if (column.sorting) {
+    if (column.sort) {
       const onClick = (e: any) => {
         const sortOrder =
-          isEmpty(column.sortOrder) || column.sortOrder === 'asc'
-            ? 'desc'
-            : 'asc';
-        headers[i] = { ...column, sortOrder };
+          isEmpty(column.sort) || column.sort === 'asc' ? 'desc' : 'asc';
+        headers[i] = { ...column, sort: sortOrder };
         setHeaders([...headers]);
-        setSortsState(
-          uniqBy(
-            [
-              { accessor: column.accessor, sortOrder: sortOrder },
-              ...sortsState,
-            ],
-            'accessor'
-          )
-        );
       };
 
       headerProps = {
@@ -113,24 +170,12 @@ function useTable<T extends { [key:string]: any }>({
       };
     }
 
-    if (isFunction(column.filtering)) {
+    if (isFunction(column.filter)) {
       setFilter = debounce((value: string) => {
-        setFiltersState(
-          uniqBy(
-            [
-              { accessor: column.accessor, filterValue: value },
-              ...filtersState,
-            ],
-            'accessor'
-          )
-        );
+        headers[i] = { ...column, filterValue: value };
+        setHeaders([...headers]);
       }, 85);
     }
-
-    const getSortOrder = () => {
-      const sort = find(sortsState, { accessor: column.accessor });
-      return sort ? sort.sortOrder : undefined;
-    };
 
     return {
       getHeaderProps: () => {
@@ -142,18 +187,14 @@ function useTable<T extends { [key:string]: any }>({
       render: () => {
         return colHeader;
       },
-      sortOrder: getSortOrder(),
-      // getSortOrder: () => {
-      //   const sort = find(sortsState, { accessor: column.accessor });
-      //   return sort ? sort.sortOrder : '';
-      // },
+      sortOrder: getSortOrder(column.sort),
       filterValue: column.filterValue,
       setFilter,
       renderFilter:
-        column.filtering && isFunction(column.filtering)
+        column.filter && isFunction(column.filter)
           ? () => {
-              return column.filtering?.({
-                filterValue: find(filtersState, { accessor: column.accessor })
+              return column.filter?.({
+                filterValue: find(headers, { accessor: column.accessor })
                   ?.filterValue,
                 setFilter,
               });
@@ -189,8 +230,8 @@ function useTable<T extends { [key:string]: any }>({
   return {
     headers: resultHeaders,
     rows: resultRows,
-    sorts: sortsState,
-    filters: filtersState,
+    sorts: getSorts(headers),
+    filters: getFilters(headers),
   };
 }
 

@@ -7,24 +7,17 @@ import { Column, Filter, Sort, SortOrder } from '../hooks/useTable.types';
 interface DivTableProps<T> {
   columns: Column<T>[];
   data: T[];
-  tableQuery: {
-    sorts: Sort[];
-    filters: Filter[];
-  };
   onTableQueryChange: (sorts: Sort[], filter: Filter[]) => void;
 }
 
 export default function DivTable<T>({
   columns,
   data,
-  tableQuery,
   onTableQueryChange,
 }: DivTableProps<T>) {
   const { headers, rows, sorts, filters } = useTable({
     columns,
     data,
-    sorts: tableQuery.sorts,
-    filters: tableQuery.filters,
   });
 
   const renderSortOrder = (sortOrder: SortOrder) => {
