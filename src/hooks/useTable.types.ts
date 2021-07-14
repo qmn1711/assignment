@@ -19,7 +19,7 @@ export interface TableHeader {
   getClassName: (value: string) => string;
   render: () => ReactNode;
   sortOrder: SortOrder;
-  getSortOrder: () => SortOrder;
+  // getSortOrder: () => SortOrder;
   filterValue: string | undefined;
   setFilter: SetFilter;
   renderFilter: (() => ReactNode) | undefined;
@@ -38,7 +38,7 @@ export interface Column<T> {
   header: string;
   accessor: string;
   sorting?: boolean;
-  filtering?: (props: FilteringProps) => ReactNode; // TODO typeof key
+  filtering?: (props: FilteringProps) => ReactNode;
   render?: (props: any) => ReactNode;
 }
 

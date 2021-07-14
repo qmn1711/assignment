@@ -48,7 +48,7 @@ export default function DivTable<T>({
               {...column.getHeaderProps()}
             >
               <div className="header-text">
-                {column.render()} {renderSortOrder(column.getSortOrder())}
+                {column.render()} {renderSortOrder(column.sortOrder)}
               </div>
               {column.renderFilter && column.renderFilter()}
             </div>

@@ -82,7 +82,7 @@ function useTable<T extends { [key:string]: any }>({
     () => sortData(filteredRows, sortsState),
     [filteredRows, sortsState]
   );
-  const accessors = columns.map((column) => column.accessor); // TODO use reduce for only one loop
+  const accessors = columns.map((column) => column.accessor);
   const resultHeaders = headers.map((column, i) => {
     const colHeader = column.header;
     let headerProps: TableHeaderProps;
@@ -127,6 +127,11 @@ function useTable<T extends { [key:string]: any }>({
       }, 85);
     }
 
+    const getSortOrder = () => {
+      const sort = find(sortsState, { accessor: column.accessor });
+      return sort ? sort.sortOrder : undefined;
+    };
+
     return {
       getHeaderProps: () => {
         return { ...headerProps };
@@ -137,11 +142,11 @@ function useTable<T extends { [key:string]: any }>({
       render: () => {
         return colHeader;
       },
-      sortOrder: column.sortOrder,
-      getSortOrder: () => {
-        const sort = find(sortsState, { accessor: column.accessor });
-        return sort ? sort.sortOrder : '';
-      },
+      sortOrder: getSortOrder(),
+      // getSortOrder: () => {
+      //   const sort = find(sortsState, { accessor: column.accessor });
+      //   return sort ? sort.sortOrder : '';
+      // },
       filterValue: column.filterValue,
       setFilter,
       renderFilter:
@@ -162,7 +167,7 @@ function useTable<T extends { [key:string]: any }>({
       .filter((key) => accessors.includes(key))
       .map((key) => {
         return {
-          getCellProps: () => {},
+          getCellProps: () => ({}),
           getClassName: (className: string) => {
             return `${className} ${key}`;
           },
