@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import range from 'lodash/range'
 
 interface Settings {
@@ -9,7 +9,20 @@ interface Settings {
   maxIndex: number
   startIndex: number
 }
-interface Props {
+
+interface State {
+  settings: Settings
+  viewportHeight: number
+  totalHeight: number
+  toleranceHeight: number
+  bufferHeight: number
+  bufferedItems: number
+  topPaddingHeight: number
+  bottomPaddingHeight: number
+  initialPosition: number
+  data: number[]
+}
+export interface Props {
   className: string
   itemHeight: number
   amount: number
@@ -20,13 +33,13 @@ interface Props {
 const defaultSettings: Settings = {
   itemHeight: 0,
   amount: 0,
-  tolerance: 0,
+  tolerance: 3,
   minIndex: 0,
   maxIndex: 0,
-  startIndex: 1,
+  startIndex: 0,
 }
 
-const setInitialState = (itemHeight: number, amount: number, maxIndex: number) => {
+const setInitialState = (itemHeight: number, amount: number, maxIndex: number): State => {
   const settings: Settings = {
     ...defaultSettings,
     itemHeight,
@@ -44,6 +57,7 @@ const setInitialState = (itemHeight: number, amount: number, maxIndex: number) =
   const topPaddingHeight = itemsAbove * itemHeight
   const bottomPaddingHeight = totalHeight - topPaddingHeight
   const initialPosition = topPaddingHeight + toleranceHeight
+
   return {
     settings,
     viewportHeight,
@@ -62,16 +76,17 @@ function VirtualScroller({ itemHeight, amount, maxIndex, children, className }: 
   const [state, setState] = useState(() => setInitialState(itemHeight, amount, maxIndex))
   const viewportElement = useRef<HTMLDivElement>(null)
 
-  const calculate = (currentState: any, scrollTop: number) => {
+  const calculate = (currentState: State, scrollTop: number) => {
     const {
       totalHeight,
       toleranceHeight,
       bufferedItems,
-      settings: { itemHeight, minIndex },
+      settings: { itemHeight, minIndex, maxIndex, amount },
     } = currentState
-    const index = minIndex + Math.floor((scrollTop - toleranceHeight) / itemHeight)
-    const data: any = range(index, index + bufferedItems)
-    // const currentIndex = index;
+
+    const currentHeight = scrollTop >= toleranceHeight ? scrollTop - toleranceHeight : 0
+    const index = minIndex + Math.floor(currentHeight / itemHeight)
+    const data: any = range(index, Math.min(index + bufferedItems, Math.max(maxIndex + 1, amount)))
     const topPaddingHeight = Math.max((index - minIndex) * itemHeight, 0)
     const bottomPaddingHeight = Math.max(totalHeight - topPaddingHeight - data.length * itemHeight, 0)
 
@@ -90,16 +105,6 @@ function VirtualScroller({ itemHeight, amount, maxIndex, children, className }: 
       ...result,
     })
   }
-
-  useEffect(() => {
-    if (viewportElement.current) {
-      viewportElement.current.scrollTop = state.initialPosition
-
-      if (state.initialPosition) {
-        runScroller({ target: { scrollTop: 0 } })
-      }
-    }
-  }, []) // eslint-disable-line
 
   useEffect(() => {
     let newState = setInitialState(itemHeight, amount, maxIndex)

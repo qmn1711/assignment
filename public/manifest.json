@@ -1,6 +1,6 @@
 {
   "short_name": "React App",
-  "name": "React App with Webpack",
+  "name": "React App using webpack",
   "icons": [
     {
       "src": "favicon.ico",

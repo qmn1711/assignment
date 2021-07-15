@@ -53,10 +53,13 @@ afterAll(() => server.close())
 test('loads and display candidates', async () => {
   const { container, getByText } = render(<Candidates endpoint="/candidates" />)
 
-  expect(container.getElementsByClassName('loading-applications').length).toBe(1)
+  expect(container.getElementsByClassName('loader').length).toBe(1)
 
   await waitFor(() => expect(container.getElementsByClassName('table').length).toBe(1))
 
+  expect(container.getElementsByClassName('sortable').length).toBe(3)
+  expect(container.getElementsByClassName('filter-input').length).toBe(2)
+  expect(container.getElementsByClassName('filter-select').length).toBe(1)
   expect(container.getElementsByClassName('cell name').length).toBe(3)
 
   fireEvent(
@@ -67,6 +70,18 @@ test('loads and display candidates', async () => {
     })
   )
 
+  expect(getByText('Years of Experience').getElementsByClassName('arrow up').length).toBe(1)
+  expect(container.getElementsByClassName('cell year_of_experience').length).toBe(3)
+
+  fireEvent(
+    getByText('Years of Experience'),
+    new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true,
+    })
+  )
+
+  expect(getByText('Years of Experience').getElementsByClassName('arrow down').length).toBe(1)
   expect(container.getElementsByClassName('cell year_of_experience').length).toBe(3)
 })
 
@@ -78,8 +93,6 @@ test('loads and display error message', async () => {
   )
 
   const { container } = render(<Candidates endpoint="/candidates" />)
-
-  expect(container.getElementsByClassName('loading-applications').length).toBe(1)
-
+  expect(container.getElementsByClassName('loader').length).toBe(1)
   await waitFor(() => expect(container.getElementsByClassName('message error').length).toBe(1))
 })

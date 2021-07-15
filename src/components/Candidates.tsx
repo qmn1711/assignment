@@ -131,7 +131,7 @@ function Candidates({ endpoint }: { endpoint: string }) {
         }
       } catch (error) {
         console.log('error', error)
-        setErrorMsg(error.message ? error.message : JSON.stringify(error))
+        setErrorMsg(error.message || JSON.stringify(error))
       } finally {
         setLoading(false)
       }

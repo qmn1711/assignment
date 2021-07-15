@@ -148,7 +148,13 @@ function useTable<T extends { [key: string]: any }>({ columns, data }: TableProp
         return { ...headerProps }
       },
       getClassName: (className: string) => {
-        return `${className} ${column.accessor}`
+        const classNames = [className, column.accessor]
+
+        if (column.sort) {
+          classNames.push('sortable')
+        }
+
+        return classNames.join(' ')
       },
       render: () => {
         return colHeader
