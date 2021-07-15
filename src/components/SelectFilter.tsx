@@ -1,8 +1,8 @@
-import { FilteringProps } from '../hooks/useTable.types';
+import { FilteringProps } from '../hooks/useTable.types'
 
 interface SelectFilterProps<T> extends FilteringProps {
-  data: T[];
-  className?: string;
+  data: T[]
+  className?: string
 }
 export default function SelectFilter<T extends { value: string; text: string }>({
   data,
@@ -10,19 +10,15 @@ export default function SelectFilter<T extends { value: string; text: string }>(
   setFilter,
   className,
 }: SelectFilterProps<T>) {
-  const changeHandler = ({ target: { value } }: any) => setFilter(value);
+  const changeHandler = ({ target: { value } }: any) => setFilter(value)
 
   return (
-    <select
-      className={`${className} no-focusborder`}
-      value={filterValue}
-      onChange={changeHandler}
-    >
+    <select className={`${className} no-focusborder`} value={filterValue} onChange={changeHandler}>
       {data.map(({ value, text }: T, i: number) => (
         <option key={i} value={value}>
           {text}
         </option>
       ))}
     </select>
-  );
+  )
 }

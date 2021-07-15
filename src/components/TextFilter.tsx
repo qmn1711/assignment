@@ -1,15 +1,15 @@
-import { FilteringProps } from '../hooks/useTable.types';
+import { FilteringProps } from '../hooks/useTable.types'
 
-import './TextFilter.css';
+import './TextFilter.css'
 
 function TextFilter({ filterValue, setFilter }: FilteringProps) {
   const clickHandler = (e: any) => {
-    e.stopPropagation();
-  };
+    e.stopPropagation()
+  }
 
   const changeHandler = (e: any) => {
-    setFilter(e.target.value);
-  };
+    setFilter(e.target.value)
+  }
 
   return (
     <input
@@ -19,7 +19,7 @@ function TextFilter({ filterValue, setFilter }: FilteringProps) {
       onChange={changeHandler}
       onClick={clickHandler}
     />
-  );
+  )
 }
 
-export default TextFilter;
+export default TextFilter

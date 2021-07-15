@@ -1,74 +1,71 @@
-import { ReactNode, MouseEvent, CSSProperties } from 'react';
+import { ReactNode, MouseEvent, CSSProperties } from 'react'
 
-export type SortOrder = 'asc' | 'desc' | undefined;
+export type SortOrder = 'asc' | 'desc' | undefined
 
-export type SetFilter = (value: string) => void;
+export type SetFilter = (value: string) => void
 
 export interface FilteringProps {
-  filterValue: string | undefined;
-  setFilter: SetFilter;
+  filterValue: string | undefined
+  setFilter: SetFilter
 }
 
 export interface TableHeaderProps {
-  onClick: (e: MouseEvent) => void;
-  style: CSSProperties;
+  onClick: (e: MouseEvent) => void
+  style: CSSProperties
 }
 export interface TableHeader {
-  getHeaderProps: () => TableHeaderProps;
-  getClassName: (value: string) => string;
-  render: () => ReactNode;
-  sortOrder: SortOrder;
+  getHeaderProps: () => TableHeaderProps
+  getClassName: (value: string) => string
+  render: () => ReactNode
+  sortOrder: SortOrder
   // getSortOrder: () => SortOrder;
-  filterValue: string | undefined;
-  setFilter: SetFilter;
-  renderFilter: (() => ReactNode) | undefined;
+  filterValue: string | undefined
+  setFilter: SetFilter
+  renderFilter: (() => ReactNode) | undefined
 }
 
 export interface TableCell {
-  getCellProps: () => void;
-  getClassName: (value: string) => string;
-  render: () => ReactNode;
+  getCellProps: () => void
+  getClassName: (value: string) => string
+  render: () => ReactNode
 }
 export interface TableRow {
-  cells: TableCell[];
+  cells: TableCell[]
 }
 
 export interface Column<T> {
-  header: string;
-  accessor: string; // keyof T
-  sort?: boolean | undefined;
-  sortOrder?: SortOrder;
-  filter?: (props: FilteringProps) => ReactNode;
-  filterValue?: string | undefined;
-  render?: (props: any) => ReactNode;
+  header: string
+  accessor: string // keyof T
+  sort?: boolean | undefined
+  sortOrder?: SortOrder
+  filter?: (props: FilteringProps) => ReactNode
+  filterValue?: string | undefined
+  render?: (props: any) => ReactNode
 }
 
-export interface TableColumn<T> extends Column<T> {
-  // sortOrder?: SortOrder;
-  // filterValue?: string | undefined;
-}
+export type TableColumn<T> = Column<T>
 export interface Sort {
-  accessor: string;
-  sort: SortOrder;
+  accessor: string
+  sort: SortOrder
 }
 
 export interface Filter {
-  accessor: string;
-  filterValue: string;
+  accessor: string
+  filterValue: string
 }
 
 export interface TableQuery {
-  sorts?: Sort[];
-  filters?: Filter[];
+  sorts?: Sort[]
+  filters?: Filter[]
 }
 export interface TableProps<T> {
-  columns: TableColumn<T>[];
-  data: T[];
+  columns: TableColumn<T>[]
+  data: T[]
 }
 
 export interface ReturnTable {
-  headers: TableHeader[];
-  rows: TableRow[];
-  sorts: Sort[];
-  filters: Filter[];
+  headers: TableHeader[]
+  rows: TableRow[]
+  sorts: Sort[]
+  filters: Filter[]
 }

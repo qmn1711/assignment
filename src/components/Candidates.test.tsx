@@ -1,9 +1,9 @@
-import { rest } from 'msw';
-import { setupServer } from 'msw/node';
-import { render, fireEvent, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
+import { rest } from 'msw'
+import { setupServer } from 'msw/node'
+import { render, fireEvent, waitFor } from '@testing-library/react'
+import '@testing-library/jest-dom/extend-expect'
 
-import Candidates from './Candidates';
+import Candidates from './Candidates'
 
 const SampleData = {
   data: [
@@ -38,32 +38,26 @@ const SampleData = {
       status: 'approved',
     },
   ],
-};
+}
 
 const server = setupServer(
   rest.get('/candidates', (req, res, ctx) => {
-    return res(ctx.json(SampleData));
+    return res(ctx.json(SampleData))
   })
-);
+)
 
-beforeAll(() => server.listen());
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 test('loads and display candidates', async () => {
-  const { container, getByText } = render(
-    <Candidates endpoint="/candidates" />
-  );
+  const { container, getByText } = render(<Candidates endpoint="/candidates" />)
 
-  expect(container.getElementsByClassName('loading-applications').length).toBe(
-    1
-  );
+  expect(container.getElementsByClassName('loading-applications').length).toBe(1)
 
-  await waitFor(() =>
-    expect(container.getElementsByClassName('table').length).toBe(1)
-  );
+  await waitFor(() => expect(container.getElementsByClassName('table').length).toBe(1))
 
-  expect(container.getElementsByClassName('cell name').length).toBe(3);
+  expect(container.getElementsByClassName('cell name').length).toBe(3)
 
   fireEvent(
     getByText('Years of Experience'),
@@ -71,30 +65,21 @@ test('loads and display candidates', async () => {
       bubbles: true,
       cancelable: true,
     })
-  );
+  )
 
-  expect(
-    container.getElementsByClassName('cell year_of_experience').length
-  ).toBe(3);
-});
+  expect(container.getElementsByClassName('cell year_of_experience').length).toBe(3)
+})
 
 test('loads and display error message', async () => {
   server.use(
     rest.get('/candidates', (req, res, ctx) => {
-      return res(
-        ctx.status(500),
-        ctx.json({ error: { code: 500, message: 'Server Error' } })
-      );
+      return res(ctx.status(500), ctx.json({ error: { code: 500, message: 'Server Error' } }))
     })
-  );
+  )
 
-  const { container } = render(<Candidates endpoint="/candidates" />);
+  const { container } = render(<Candidates endpoint="/candidates" />)
 
-  expect(container.getElementsByClassName('loading-applications').length).toBe(
-    1
-  );
+  expect(container.getElementsByClassName('loading-applications').length).toBe(1)
 
-  await waitFor(() =>
-    expect(container.getElementsByClassName('message error').length).toBe(1)
-  );
-});
+  await waitFor(() => expect(container.getElementsByClassName('message error').length).toBe(1))
+})
