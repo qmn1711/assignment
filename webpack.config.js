@@ -1,26 +1,25 @@
-const path = require('path');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyPlugin = require('copy-webpack-plugin');
-const Dotenv = require('dotenv-webpack');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const CompressionPlugin = require('compression-webpack-plugin');
-const BundleAnalyzerPlugin =
-  require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const fs = require('fs');
-const directoryPath = path.resolve('public');
+const path = require('path')
+const webpack = require('webpack')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin')
+const Dotenv = require('dotenv-webpack')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const CompressionPlugin = require('compression-webpack-plugin')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const fs = require('fs')
+const directoryPath = path.resolve('public')
 
 const handleDir = () => {
   return new Promise((resolve, reject) => {
     fs.readdir(directoryPath, (err, files) => {
       if (err) {
-        reject('Unable to scan directory: ' + err);
+        reject('Unable to scan directory: ' + err)
       }
-      resolve(files);
-    });
-  });
-};
+      resolve(files)
+    })
+  })
+}
 
 const getCopyPluginPatterns = (dirs) => {
   return dirs
@@ -30,9 +29,9 @@ const getCopyPluginPatterns = (dirs) => {
         from: dir,
         to: '',
         context: path.resolve('public'),
-      };
-    });
-};
+      }
+    })
+}
 
 const getBasePlugins = (dirs, isDev) => {
   return [
@@ -47,11 +46,11 @@ const getBasePlugins = (dirs, isDev) => {
       filename: isDev ? '[name].css' : 'static/css/[name].[contenthash:6].css',
     }),
     new webpack.ProgressPlugin(),
-  ];
-};
+  ]
+}
 
 const getProdPlugins = (dirs, isAnalyze) => {
-  const basePlugins = getBasePlugins(dirs, false);
+  const basePlugins = getBasePlugins(dirs, false)
 
   let prodPlugins = [
     ...basePlugins,
@@ -59,13 +58,13 @@ const getProdPlugins = (dirs, isAnalyze) => {
     new CompressionPlugin({
       test: /\.(css|js|html|svg)$/,
     }),
-  ];
+  ]
   if (isAnalyze) {
-    prodPlugins = [...prodPlugins, new BundleAnalyzerPlugin()];
+    prodPlugins = [...prodPlugins, new BundleAnalyzerPlugin()]
   }
 
-  return prodPlugins;
-};
+  return prodPlugins
+}
 
 const getDevServer = () => {
   return {
@@ -75,13 +74,13 @@ const getDevServer = () => {
     watchContentBase: true,
     historyApiFallback: true,
     open: true,
-  };
-};
+  }
+}
 
 module.exports = async (env, agrv) => {
-  const isDev = agrv.mode === 'development';
-  const isAnalyze = env && env.analyze;
-  const dirs = await handleDir();
+  const isDev = agrv.mode === 'development'
+  const isAnalyze = env && env.analyze
+  const dirs = await handleDir()
 
   return {
     entry: './src/index.tsx',
@@ -89,7 +88,7 @@ module.exports = async (env, agrv) => {
       rules: [
         {
           test: /\.(ts|tsx)$/,
-          use: ['ts-loader'],
+          use: ['ts-loader', 'eslint-loader'],
           exclude: /node_modules/,
         },
         {
@@ -112,9 +111,7 @@ module.exports = async (env, agrv) => {
             {
               loader: 'file-loader',
               options: {
-                name: isDev
-                  ? '[path][name].[ext]'
-                  : 'static/fonts/[name].[ext]',
+                name: isDev ? '[path][name].[ext]' : 'static/fonts/[name].[ext]',
               },
             },
           ],
@@ -125,9 +122,7 @@ module.exports = async (env, agrv) => {
             {
               loader: 'file-loader',
               options: {
-                name: isDev
-                  ? '[path][name].[ext]'
-                  : 'static/media/[name].[contenthash:6].[ext]',
+                name: isDev ? '[path][name].[ext]' : 'static/media/[name].[contenthash:6].[ext]',
               },
             },
           ],
@@ -153,11 +148,9 @@ module.exports = async (env, agrv) => {
     },
     devtool: isDev ? 'source-map' : false,
     devServer: isDev ? getDevServer() : undefined,
-    plugins: isDev
-      ? getBasePlugins(dirs, isDev)
-      : getProdPlugins(dirs, isAnalyze),
+    plugins: isDev ? getBasePlugins(dirs, isDev) : getProdPlugins(dirs, isAnalyze),
     performance: {
       maxEntrypointSize: 800000,
     },
-  };
-};
+  }
+}
