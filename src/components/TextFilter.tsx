@@ -1,6 +1,6 @@
 import { FilteringProps } from '../hooks/useTable.types'
 
-import './TextFilter.css'
+import './TextFilter.scss'
 
 function TextFilter({ filterValue, setFilter }: FilteringProps) {
   const clickHandler = (e: any) => {

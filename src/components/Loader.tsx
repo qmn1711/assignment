@@ -1,8 +1,8 @@
-import './Loader.css'
+import './Loader.scss'
 
 function Loader() {
   return (
-    <div className="lds-ellipsis loading-applications">
+    <div className="lds-ellipsis loader">
       <div></div>
       <div></div>
       <div></div>

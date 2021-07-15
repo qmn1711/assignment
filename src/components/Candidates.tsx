@@ -8,7 +8,7 @@ import SelectFilter from './SelectFilter'
 import Loader from './Loader'
 import { addTableQueryToColumns } from '../hooks/useTable'
 
-import './Candidates.css'
+import './Candidates.scss'
 
 export const StatusData = [
   {
@@ -109,7 +109,7 @@ const getErrorMsg = ({ code }: { code: number; message: string }) => {
 }
 
 function Candidates({ endpoint }: { endpoint: string }) {
-  const [isLoading, setLoading] = useState(true)
+  const [isLoading, setLoading] = useState(false)
   const [data, setData] = useState([])
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -148,7 +148,7 @@ function Candidates({ endpoint }: { endpoint: string }) {
     )
   }
 
-  return isLoading ? <Loader /> : renderContent()
+  return <div className="wrapper">{isLoading ? <Loader /> : renderContent()}</div>
 }
 
 export default Candidates

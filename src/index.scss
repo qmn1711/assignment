@@ -10,8 +10,18 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+.error {
+  color: red;
+}
+
 .no-focusborder:focus {
   outline-style: none;
   box-shadow: none;
   border-color: transparent;
+}
+
+.truncate-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

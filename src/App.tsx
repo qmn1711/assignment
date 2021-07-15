@@ -1,6 +1,6 @@
 import Candidates from './components/Candidates'
 
-import './App.css'
+import './App.scss'
 
 const CANDIDATES_ENDPOINT = 'http://personio-fe-test.herokuapp.com/api/v1/candidates'
 
@@ -9,7 +9,7 @@ const CandidateImage =
 
 function App() {
   return (
-    <div className="App">
+    <div className="app">
       <div className="candidates">
         <div className="title">
           <div>
