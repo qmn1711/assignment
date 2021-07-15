@@ -35,15 +35,16 @@ export interface TableRow {
 
 export interface Column<T> {
   header: string;
-  accessor: string;
-  sort?: SortOrder | boolean;
+  accessor: string; // keyof T
+  sort?: boolean | undefined;
+  sortOrder?: SortOrder;
   filter?: (props: FilteringProps) => ReactNode;
   filterValue?: string | undefined;
   render?: (props: any) => ReactNode;
 }
 
 export interface TableColumn<T> extends Column<T> {
-  sortOrder?: SortOrder;
+  // sortOrder?: SortOrder;
   // filterValue?: string | undefined;
 }
 export interface Sort {

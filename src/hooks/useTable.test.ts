@@ -69,7 +69,14 @@ describe('useTable with sorts', () => {
       accessor: Columns[0].accessor,
       sort: 'desc',
     };
-    const columns = addTableQueryToColumns(Columns, {
+
+    let columns: Column<any>[] = [
+      { header: 'Name', accessor: 'name', sort: true },
+      { header: 'Age', accessor: 'age' },
+      { header: 'Role', accessor: 'role' },
+    ];
+
+    columns = addTableQueryToColumns(columns, {
       sorts: [sortFirstColumn],
     });
 
@@ -159,7 +166,13 @@ describe('useTable with sorts', () => {
       accessor: Columns[1].accessor,
       sort: 'asc',
     };
-    const columns = addTableQueryToColumns(Columns, {
+
+    let columns: Column<any>[] = [
+      { header: 'Name', accessor: 'name', sort: true },
+      { header: 'Age', accessor: 'age', sort: true },
+      { header: 'Role', accessor: 'role' },
+    ];
+    columns = addTableQueryToColumns(columns, {
       sorts: [sortFirstColumn, sortSecondColumn],
     });
 
@@ -273,7 +286,9 @@ describe('useTable with filters', () => {
       data: Data,
     };
 
-    const { result, waitForValueToChange } = renderHook(() => useTable(simpleInput));
+    const { result, waitForValueToChange } = renderHook(() =>
+      useTable(simpleInput)
+    );
 
     const thirdColumn = result.current.headers[2];
     expect(thirdColumn.filterValue).toBe(personRole);
@@ -300,8 +315,8 @@ describe('useTable with filters', () => {
     act(() => {
       thirdColumn.setFilter(anotherRole);
     });
-    
-    await waitForValueToChange(() => result.current.headers)
+
+    await waitForValueToChange(() => result.current.headers);
 
     const thirdColumnAnother = result.current.headers[2];
     expect(thirdColumnAnother.filterValue).toBe(anotherRole);
@@ -414,7 +429,7 @@ describe('useTable with sorts and filters', () => {
         accessor: 'name',
         filter: ({ filterValue, setFilter }) => filterValue,
       },
-      { header: 'Age', accessor: 'age' },
+      { header: 'Age', accessor: 'age', sort: true },
       { header: 'Role', accessor: 'role' },
     ];
     columns = addTableQueryToColumns(columns, {

@@ -15,9 +15,6 @@ import { addTableQueryToColumns } from '../hooks/useTable';
 
 import './Candidates.css';
 
-const CANDIDATES_ENDPOINT =
-  'http://personio-fe-test.herokuapp.com/api/v1/candidates';
-
 export const StatusData = [
   {
     value: '',
@@ -107,12 +104,25 @@ const changeUrl = (sorts: Sort[], filters: Filter[]) => {
 
 const ErrorMsg = ({ errorMsg }: { errorMsg: string }) => {
   return (
-    <div className="message error">{`${errorMsg} - Please try again!`}</div>
+    <div className="message error">{`${errorMsg}`}</div>
   );
 };
 
-function Candidates() {
-  const [isLoading, setLoading] = useState(false);
+const getErrorMsg = ({ code, message }: { code: number; message: string }) => {
+  const suffix = 'Please try again!';
+  let msg = 'Error occurred';
+
+  switch (code) {
+    case 500:
+      msg = 'Server error occurred';
+      break;
+  }
+
+  return [msg, suffix].join(' - ');
+};
+
+function Candidates({ endpoint }: { endpoint: string }) {
+  const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -130,15 +140,14 @@ function Candidates() {
       try {
         setLoading(true);
         setErrorMsg('');
-        const response = await fetch(CANDIDATES_ENDPOINT);
+        const response = await fetch(endpoint);
         const data = await response.json();
 
         if (data && data.error) {
-          throw new Error(data.error.message);
+          throw new Error(getErrorMsg(data.error));
         } else if (data) {
           setData(data.data);
         }
-        // throw new Error('test error handling');
       } catch (error) {
         console.log('error', error);
         setErrorMsg(error.message ? error.message : JSON.stringify(error));
@@ -148,7 +157,7 @@ function Candidates() {
     }
 
     fetchData();
-  }, []);
+  }, [endpoint]);
 
   const renderContent = () => {
     return errorMsg ? (

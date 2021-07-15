@@ -2,9 +2,13 @@
   color: red;
 }
 
+.table-wrapper {
+  overflow-x: auto;
+}
+
 .table {
   border: 2px solid black;
-  /* width: 90%; */
+  min-width: 907px;
 }
 
 .header-container {
@@ -17,6 +21,10 @@
 }
 
 .header-text {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
   position: relative;
 }
 
@@ -67,34 +75,50 @@
   border-right: none;
 }
 
+.cell-wrapper {
+  display: flex;
+  width: 70px;
+  min-width: none;
+  /* padding: 0 10px; */
+}
+
+.truncate-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .header-column.name,
 .cell.name {
-  width: 300px;
+  /* width: 300px; */
+  min-width: 150px;
+  max-width: 150px;
+  /* width: 150px; */
 }
 
 .header-column.email,
 .cell.email {
-  width: 25%;
+  width: 251px;
 }
 
 .header-column.birth_date,
 .cell.birth_date {
-  width: 100px;
+  width: 101px;
 }
 
 .header-column.year_of_experience,
 .cell.year_of_experience {
-  width: 200px;
+  width: 201px;
 }
 
 .header-column.position_applied,
 .cell.position_applied {
-  width: 200px;
+  width: 201px;
 }
 
 .header-column.application_date,
 .cell.application_date {
-  width: 120px;
+  width: 121px;
   /* flex: 1 1 auto; */
 }
 
@@ -110,7 +134,7 @@
 }
 
 .arrow {
-  position: absolute;
+  position: relative;
 
   width: 0;
   height: 0;
@@ -118,15 +142,102 @@
 }
 
 .arrow.up {
-  top: 7px;
+  /* top: 7px; */
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-bottom: 5px solid black;
 }
 
 .arrow.down {
-  top: 7px;
+  /* top: 7px; */
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-top: 5px solid black;
 }
+
+@media only screen and (max-width: 1199px) {
+  .header-column.name,
+  .cell.name {
+    /* min-width: 150px;
+    max-width: 150px; */
+    min-width: 170px;
+    max-width: 170px;
+  }
+  
+  .header-column.email,
+  .cell.email {
+    min-width: 170px;
+    max-width: 170px;
+  }
+  
+  .header-column.birth_date,
+  .cell.birth_date {
+    min-width: 70px;
+    max-width: 70px;
+  }
+  
+  .header-column.year_of_experience,
+  .cell.year_of_experience {
+    min-width: 130px;
+    max-width: 130px;
+  }
+  
+  .header-column.position_applied,
+  .cell.position_applied {
+    min-width: 150px;
+    max-width: 150px;
+  }
+  
+  .header-column.application_date,
+  .cell.application_date {
+    min-width: 105px;
+    max-width: 105px;
+  }
+  
+  .header-column.status,
+  .cell.status {
+    flex: 1;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .header-column.name,
+  .cell.name {
+    min-width: 20%;
+    max-width: 20%;
+  }
+  
+  .header-column.email,
+  .cell.email {
+    min-width: 20%;
+    max-width: 20%;
+  }
+  
+  .header-column.birth_date,
+  .cell.birth_date {
+    width: 100px;
+  }
+  
+  .header-column.year_of_experience,
+  .cell.year_of_experience {
+    width: 200px;
+  }
+  
+  .header-column.position_applied,
+  .cell.position_applied {
+    width: 200px;
+  }
+  
+  .header-column.application_date,
+  .cell.application_date {
+    width: 120px;
+    /* flex: 1 1 auto; */
+  }
+  
+  .header-column.status,
+  .cell.status {
+    /* width: 70px; */
+    flex: 1 1 auto;
+  }
+}
+

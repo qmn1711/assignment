@@ -31,47 +31,49 @@ export default function DivTable<T>({
   }, [sorts, filters, onTableQueryChange]);
 
   return (
-    <div className="table">
-      <div className="header-container">
-        <div className="headers">
-          {headers.map((column, i) => (
-            <div
-              key={i}
-              className={column.getClassName('header-column')}
-              {...column.getHeaderProps()}
-            >
-              <div className="header-text">
-                {column.render()} {renderSortOrder(column.sortOrder)}
+    <div className="table-wrapper">
+      <div className="table">
+        <div className="header-container">
+          <div className="headers">
+            {headers.map((column, i) => (
+              <div
+                key={i}
+                className={column.getClassName('header-column')}
+                {...column.getHeaderProps()}
+              >
+                <div className="header-text">
+                  {column.render()} {renderSortOrder(column.sortOrder)}
+                </div>
+                {column.renderFilter && column.renderFilter()}
               </div>
-              {column.renderFilter && column.renderFilter()}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
-      <div>
-        <VirtualScroller
-          className="content-viewport"
-          itemHeight={40}
-          amount={10}
-          maxIndex={rows.length - 1}
-        >
-          {({ index }) => {
-            const row = rows[index];
-            const styleClass = index % 2 ? 'even' : 'odd';
+        <div>
+          <VirtualScroller
+            className="content-viewport"
+            itemHeight={40}
+            amount={10}
+            maxIndex={rows.length - 1}
+          >
+            {({ index }) => {
+              const row = rows[index];
+              const styleClass = index % 2 ? 'even' : 'odd';
 
-            return (
-              <div className={`row ${styleClass}`} key={index}>
-                {row?.cells.map((cell, j) => {
-                  return (
-                    <div className={cell.getClassName('cell')} key={j}>
-                      {cell.render()}
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          }}
-        </VirtualScroller>
+              return (
+                <div className={`row ${styleClass}`} key={index}>
+                  {row?.cells.map((cell, j) => {
+                    return (
+                      <div key={j} className={cell.getClassName('cell truncate-text')}>
+                        {cell.render()}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            }}
+          </VirtualScroller>
+        </div>
       </div>
     </div>
   );

@@ -11,21 +11,11 @@ import {
   Filter,
   ReturnTable,
   Sort,
-  SortOrder,
   TableColumn,
   TableHeaderProps,
   TableProps,
   TableQuery,
 } from './useTable.types';
-
-const getSortOrder = (sortOrder: SortOrder | boolean) => {
-  let result = sortOrder;
-  if (typeof result === 'boolean') {
-    result = undefined;
-  }
-
-  return result;
-};
 
 export const addTableQueryToColumns = <T>(
   columns: Column<T>[],
@@ -44,7 +34,7 @@ export const addTableQueryToColumns = <T>(
 
     return {
       ...column,
-      sort: sort?.sort,
+      sortOrder: sort?.sort,
       filterValue: filter?.filterValue,
     };
   });
@@ -90,11 +80,11 @@ const sortData = <T>(data: T[], columns: Column<T>[]): T[] => {
 
   if (!isEmpty(columns)) {
     const { fields, sortOrders } = columns
-      .filter((column) => !isEmpty(column.sort))
+      .filter((column) => !isEmpty(column.sortOrder))
       .reduce(
         (accum, currentValue) => {
           accum.fields.push(currentValue.accessor);
-          accum.sortOrders.push(currentValue.sort);
+          accum.sortOrders.push(currentValue.sortOrder);
           return accum;
         },
         { fields: [] as string[], sortOrders: [] as any[] }
@@ -125,10 +115,10 @@ const getSorts = <T>(columns: TableColumn<T>[]): Sort[] => {
   let result: Sort[] = [];
 
   if (!isEmpty(columns)) {
-    result = filter(columns, (column) => !isEmpty(column.sort)).map(
+    result = filter(columns, (column) => !isEmpty(column.sortOrder)).map(
       (column) => ({
         accessor: column.accessor,
-        sort: getSortOrder(column.sort),
+        sort: column.sortOrder,
       })
     );
   }
@@ -159,8 +149,8 @@ function useTable<T extends { [key: string]: any }>({
     if (column.sort) {
       const onClick = (e: any) => {
         const sortOrder =
-          isEmpty(column.sort) || column.sort === 'asc' ? 'desc' : 'asc';
-        headers[i] = { ...column, sort: sortOrder };
+          isEmpty(column.sortOrder) || column.sortOrder === 'asc' ? 'desc' : 'asc';
+        headers[i] = { ...column, sortOrder: sortOrder };
         setHeaders([...headers]);
       };
 
@@ -187,7 +177,7 @@ function useTable<T extends { [key: string]: any }>({
       render: () => {
         return colHeader;
       },
-      sortOrder: getSortOrder(column.sort),
+      sortOrder: column.sortOrder,
       filterValue: column.filterValue,
       setFilter,
       renderFilter:
