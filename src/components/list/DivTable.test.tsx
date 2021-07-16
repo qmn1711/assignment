@@ -3,8 +3,8 @@ import '@testing-library/jest-dom/extend-expect'
 import userEvent from '@testing-library/user-event'
 
 import DivTable from './DivTable'
-import TextFilter from './TextFilter'
-import { FilteringProps } from '../hooks/useTable.types'
+import TextFilter from '../common/TextFilter'
+import { FilteringProps } from '../../hooks/useTable.type'
 
 const SampleData = [
   {

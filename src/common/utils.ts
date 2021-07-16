@@ -1,6 +1,6 @@
 import isEmpty from 'lodash/isEmpty'
 
-import { Filter, Sort, SortOrder, TableQuery } from './hooks/useTable.types'
+import { Filter, Sort, SortOrder, TableQuery } from '../hooks/useTable.type'
 
 export const SORT_PREFIX = 'sort_'
 export const FILTER_PREFIX = 'filter_'

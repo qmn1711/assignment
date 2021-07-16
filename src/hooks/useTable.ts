@@ -15,7 +15,7 @@ import {
   TableHeaderProps,
   TableProps,
   TableQuery,
-} from './useTable.types'
+} from './useTable.type'
 
 export const addTableQueryToColumns = <T>(columns: Column<T>[], tableQuery: TableQuery): Column<T>[] => {
   if (isEmpty(columns) || isEmpty(tableQuery) || (isEmpty(tableQuery.sorts) && isEmpty(tableQuery.filters)))

@@ -1,4 +1,4 @@
-import Candidates from './components/Candidates'
+import Candidates from './pages/Candidates'
 
 import './App.scss'
 

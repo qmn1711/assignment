@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 
-import useTable from '../hooks/useTable'
+import useTable from '../../hooks/useTable'
 import VirtualScroller from './VirtualScroller'
-import { Column, Filter, Sort, SortOrder } from '../hooks/useTable.types'
+import { Column, Filter, Sort, SortOrder } from '../../hooks/useTable.type'
 
 interface DivTableProps<T> {
   columns: Column<T>[]

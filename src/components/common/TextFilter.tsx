@@ -1,4 +1,4 @@
-import { FilteringProps } from '../hooks/useTable.types'
+import { FilteringProps } from '../../hooks/useTable.type'
 
 import './TextFilter.scss'
 

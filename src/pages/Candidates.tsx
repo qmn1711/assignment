@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 
-import { buildTableQueryFromUrlParams, buildUrlParams, calculateAge, capitalizeFirstLetter } from '../utils'
-import DivTable from './DivTable'
-import { Filter, FilteringProps, Sort } from '../hooks/useTable.types'
-import TextFilter from './TextFilter'
-import SelectFilter from './SelectFilter'
-import Loader from './Loader'
+import { buildTableQueryFromUrlParams, buildUrlParams, calculateAge, capitalizeFirstLetter } from '../common/utils'
+import { Filter, FilteringProps, Sort } from '../hooks/useTable.type'
+import TextFilter from '../components/common/TextFilter'
+import SelectFilter from '../components/common/SelectFilter'
+import Loader from '../components/common/Loader'
 import { addTableQueryToColumns } from '../hooks/useTable'
+import DivTable from '../components/list/DivTable'
 
 import './Candidates.scss'
 

@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react-hooks'
 
 import useTable, { addTableQueryToColumns } from './useTable'
-import { Column, Filter, Sort, TableQuery } from './useTable.types'
+import { Column, Filter, Sort, TableQuery } from './useTable.type'
 
 const DefaultColumns = [
   { header: 'Name', accessor: 'name' },

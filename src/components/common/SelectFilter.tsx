@@ -1,4 +1,4 @@
-import { FilteringProps } from '../hooks/useTable.types'
+import { FilteringProps } from '../../hooks/useTable.type'
 
 interface SelectFilterProps<T> extends FilteringProps {
   data: T[]
