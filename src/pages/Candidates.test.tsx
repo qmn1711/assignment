@@ -60,7 +60,7 @@ test('loads and display candidates', async () => {
   expect(container.getElementsByClassName('sortable').length).toBe(3)
   expect(container.getElementsByClassName('filter-input').length).toBe(2)
   expect(container.getElementsByClassName('filter-select').length).toBe(1)
-  expect(container.getElementsByClassName('cell name').length).toBe(3)
+  expect(container.querySelectorAll('.cell.name:not(.empty)').length).toBe(3)
 
   fireEvent(
     getByText('Years of Experience'),
@@ -71,7 +71,7 @@ test('loads and display candidates', async () => {
   )
 
   expect(getByText('Years of Experience').getElementsByClassName('arrow up').length).toBe(1)
-  expect(container.getElementsByClassName('cell year_of_experience').length).toBe(3)
+  expect(container.querySelectorAll('.cell.year_of_experience:not(.empty)').length).toBe(3)
 
   fireEvent(
     getByText('Years of Experience'),
@@ -82,7 +82,7 @@ test('loads and display candidates', async () => {
   )
 
   expect(getByText('Years of Experience').getElementsByClassName('arrow down').length).toBe(1)
-  expect(container.getElementsByClassName('cell year_of_experience').length).toBe(3)
+  expect(container.querySelectorAll('.cell.year_of_experience:not(.empty)').length).toBe(3)
 })
 
 test('loads and display error message', async () => {

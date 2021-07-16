@@ -1,8 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 
 import useTable from '../../hooks/useTable'
 import VirtualScroller from './VirtualScroller'
-import { Column, Filter, Sort, SortOrder } from '../../hooks/useTable.type'
+import { Column, Filter, Sort, SortOrder, TableRow } from '../../hooks/useTable.type'
 
 interface DivTableProps<T> {
   columns: Column<T>[]
@@ -10,11 +10,49 @@ interface DivTableProps<T> {
   onTableQueryChange: (sorts: Sort[], filter: Filter[]) => void
 }
 
+interface EmptyRow {
+  cells: string[]
+}
+
+const Cells = ({ row }: { row: TableRow }) => {
+  return (
+    <>
+      {row.cells.map((cell, j) => {
+        return (
+          <div key={j} className={cell.getClassName('cell truncate-text')}>
+            {cell.render()}
+          </div>
+        )
+      })}
+    </>
+  )
+}
+
+const EmptyCells = ({ emptyRow }: { emptyRow: EmptyRow }) => {
+  return (
+    <>
+      {emptyRow.cells.map((cell, j) => {
+        return <div key={j} className={`${cell} cell empty`}></div>
+      })}
+    </>
+  )
+}
+
 export default function DivTable<T>({ columns, data, onTableQueryChange }: DivTableProps<T>) {
   const { headers, rows, sorts, filters } = useTable({
     columns,
     data,
   })
+
+  const emptyRow = useMemo(() => {
+    return columns.reduce(
+      (accum, column) => {
+        accum.cells.push(column.accessor)
+        return accum
+      },
+      { cells: [] } as EmptyRow
+    )
+  }, [columns])
 
   const renderSortOrder = (sortOrder: SortOrder) => {
     if (!sortOrder) return null
@@ -48,13 +86,7 @@ export default function DivTable<T>({ columns, data, onTableQueryChange }: DivTa
 
             return (
               <div className={`row ${styleClass}`} key={index}>
-                {row?.cells.map((cell, j) => {
-                  return (
-                    <div key={j} className={cell.getClassName('cell truncate-text')}>
-                      {cell.render()}
-                    </div>
-                  )
-                })}
+                {row ? <Cells row={row} /> : <EmptyCells emptyRow={emptyRow} />}
               </div>
             )
           }}

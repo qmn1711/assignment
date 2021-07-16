@@ -66,7 +66,7 @@ test('loads and display data', async () => {
 
   expect(container.getElementsByClassName('table').length).toBe(1)
   expect(container.getElementsByClassName('header-column').length).toBe(3)
-  expect(container.getElementsByClassName('cell name').length).toBe(4)
+  expect(container.querySelectorAll('.cell.name:not(.empty)').length).toBe(4)
   expect(container.getElementsByClassName('filter-input').length).toBe(1)
 
   userEvent.click(getByText('Name'))
@@ -83,5 +83,5 @@ test('loads and display data', async () => {
 
   await userEvent.type(container.getElementsByClassName('filter-input')[0], 'Rosalind', { delay: 100 })
   await waitFor(() => expect((container.getElementsByClassName('filter-input')[0] as any).value).toBe('Rosalind'))
-  expect(container.getElementsByClassName('cell name').length).toBe(2)
+  expect(container.querySelectorAll('.cell.name:not(.empty)').length).toBe(2)
 })
