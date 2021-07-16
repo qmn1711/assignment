@@ -60,7 +60,7 @@ const getColumns = () => {
       sort: true,
     },
     {
-      header: 'Position applied',
+      header: 'Applied Position',
       accessor: 'position_applied',
       sort: true,
       filter: (props: FilteringProps) => {
