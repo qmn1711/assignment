@@ -298,8 +298,6 @@ describe('useTable with filters', () => {
       thirdColumn.setFilter(anotherRole)
     })
 
-    await waitForValueToChange(() => result.current.headers)
-
     const thirdColumnAnother = result.current.headers[2]
     expect(thirdColumnAnother.filterValue).toBe(anotherRole)
     expect(typeof thirdColumnAnother.renderFilter).toBe('function')

@@ -4,7 +4,6 @@ import orderBy from 'lodash/orderBy'
 import filter from 'lodash/filter'
 import isFunction from 'lodash/isFunction'
 import find from 'lodash/find'
-import debounce from 'lodash/debounce'
 
 import {
   Column,
@@ -137,10 +136,10 @@ function useTable<T extends { [key: string]: any }>({ columns, data }: TableProp
     }
 
     if (isFunction(column.filter)) {
-      setFilter = debounce((value: string) => {
+      setFilter = (value: string) => {
         headers[i] = { ...column, filterValue: value }
         setHeaders([...headers])
-      }, 85)
+      }
     }
 
     return {
