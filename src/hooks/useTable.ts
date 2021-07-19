@@ -4,6 +4,8 @@ import orderBy from 'lodash/orderBy'
 import filter from 'lodash/filter'
 import isFunction from 'lodash/isFunction'
 import find from 'lodash/find'
+import trim from 'lodash/trimStart'
+import trimStart from 'lodash/trimStart'
 
 import {
   Column,
@@ -27,13 +29,13 @@ export const addTableQueryToColumns = <T>(columns: Column<T>[], tableQuery: Tabl
     return {
       ...column,
       sortOrder: sort?.sort,
-      filterValue: filter?.filterValue,
+      filterValue: trim(filter?.filterValue),
     }
   })
 }
 
 const filterData = <T>(data: T[], columns: Column<T>[]): T[] => {
-  const filters = columns.filter((column) => column.filter && column.filterValue)
+  const filters = columns.filter((column) => !!column.filter && !!trim(column.filterValue))
   let result = data
 
   if (!isEmpty(filters)) {
@@ -89,7 +91,7 @@ const getFilters = <T>(columns: TableColumn<T>[]): Filter[] => {
   let result: Filter[] = []
 
   if (!isEmpty(columns)) {
-    result = filter(columns, (column) => !!column.filter && !!column.filterValue).map((column) => ({
+    result = filter(columns, (column) => !!column.filter && !!trim(column.filterValue)).map((column) => ({
       accessor: column.accessor,
       filterValue: column.filterValue as string,
     }))
@@ -137,7 +139,7 @@ function useTable<T extends { [key: string]: any }>({ columns, data }: TableProp
 
     if (isFunction(column.filter)) {
       setFilter = (value: string) => {
-        headers[i] = { ...column, filterValue: value }
+        headers[i] = { ...column, filterValue: trimStart(value).replace(/ {1,}/g, ' ') }
         setHeaders([...headers])
       }
     }
