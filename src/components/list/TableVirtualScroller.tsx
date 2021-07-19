@@ -74,7 +74,7 @@ const setInitialState = (itemHeight: number, amount: number, maxIndex: number): 
 
 function VirtualScroller({ itemHeight, amount, maxIndex, children, className }: Props) {
   const [state, setState] = useState(() => setInitialState(itemHeight, amount, maxIndex))
-  const viewportElement = useRef<HTMLDivElement>(null)
+  const viewportElement = useRef<HTMLTableSectionElement>(null)
 
   const calculate = (currentState: State, scrollTop: number) => {
     const {
@@ -118,13 +118,13 @@ function VirtualScroller({ itemHeight, amount, maxIndex, children, className }: 
   const { viewportHeight, topPaddingHeight, bottomPaddingHeight, data } = state
 
   return (
-    <div className={className} ref={viewportElement} onScroll={runScroller} style={{ height: viewportHeight }}>
-      <div style={{ height: topPaddingHeight }} />
+    <tbody className={className} ref={viewportElement} onScroll={runScroller} style={{ height: viewportHeight }}>
+      <tr style={{ height: topPaddingHeight }} />
       {data.map((index: number) => {
         return children({ index })
       })}
-      <div style={{ height: bottomPaddingHeight }} />
-    </div>
+      <tr style={{ height: bottomPaddingHeight }} />
+    </tbody>
   )
 }
 

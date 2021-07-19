@@ -1,14 +1,19 @@
 import { render } from '@testing-library/react'
 
-import VirtualScroller, { Props } from './VirtualScroller'
+import TableVirtualScroller, { Props } from './TableVirtualScroller'
 
+// TODO use Cypress or other real browser testings for scroll user event
 // Cannot test scroll user event on testing library jest-dom: https://github.com/testing-library/user-event/issues/475
-// Have to use Cypress or other real browser testing approaches
 
 test('test children rendering', () => {
   const childrenMock = jest.fn(({ index }) => {
-    return index
-  })
+    return (
+      <tr key={index}>
+        <td>{index}</td>
+      </tr>
+    )
+  }) // just empty fn is enough but it's for later reference
+
   const sampleData: Props = {
     className: 'test-viewport',
     itemHeight: 10,
@@ -17,7 +22,11 @@ test('test children rendering', () => {
     children: childrenMock,
   }
 
-  render(<VirtualScroller {...sampleData} />)
+  render(
+    <table>
+      <TableVirtualScroller {...sampleData} />
+    </table>
+  )
 
   expect(childrenMock.mock.calls.length).toBe(16)
   expect(childrenMock.mock.calls[0][0]).toStrictEqual({ index: 0 })

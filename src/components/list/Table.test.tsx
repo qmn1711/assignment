@@ -2,7 +2,7 @@ import { render, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import userEvent from '@testing-library/user-event'
 
-import DivTable from './DivTable'
+import Table from './Table'
 import TextFilter from '../common/TextFilter'
 import { FilteringProps } from '../../hooks/useTable.type'
 
@@ -61,7 +61,7 @@ test('loads and display data', async () => {
   ]
 
   const { container, getByText, findAllByTestId } = render(
-    <DivTable columns={Columns} data={SampleData} onTableQueryChange={mockTableQueryChangeCallback} />
+    <Table columns={Columns} data={SampleData} onTableQueryChange={mockTableQueryChangeCallback} />
   )
 
   expect(container.getElementsByClassName('table').length).toBe(1)

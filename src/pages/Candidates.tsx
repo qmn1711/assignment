@@ -6,7 +6,7 @@ import TextFilter from '../components/common/TextFilter'
 import SelectFilter from '../components/common/SelectFilter'
 import Loader from '../components/common/Loader'
 import { addTableQueryToColumns } from '../hooks/useTable'
-import DivTable from '../components/list/DivTable'
+import Table from '../components/list/Table'
 
 import './Candidates.scss'
 
@@ -144,7 +144,7 @@ function Candidates({ endpoint }: { endpoint: string }) {
     return errorMsg ? (
       <ErrorMsg errorMsg={errorMsg} />
     ) : (
-      <DivTable columns={columns} data={data} onTableQueryChange={changeUrl} />
+      <Table columns={columns} data={data} onTableQueryChange={changeUrl} />
     )
   }
 

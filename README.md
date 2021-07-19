@@ -2,7 +2,7 @@
 
 A simple candidate applications management: listing, sorting, filtering.
 
-See the [demo.](https://applications-demo.netlify.app)
+See the [demo](https://applications-demo.netlify.app).
 
 # Getting Started
 

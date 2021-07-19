@@ -1,10 +1,10 @@
 import { useEffect, useMemo } from 'react'
 
 import useTable from '../../hooks/useTable'
-import VirtualScroller from './VirtualScroller'
+import TableVirtualScroller from './TableVirtualScroller'
 import { Column, Filter, Sort, SortOrder, TableRow } from '../../hooks/useTable.type'
 
-interface DivTableProps<T> {
+interface TableProps<T> {
   columns: Column<T>[]
   data: T[]
   onTableQueryChange: (sorts: Sort[], filter: Filter[]) => void
@@ -19,9 +19,9 @@ const Cells = ({ row }: { row: TableRow }) => {
     <>
       {row.cells.map((cell, j) => {
         return (
-          <div key={j} className={cell.getClassName('cell truncate-text')}>
+          <td key={j} className={cell.getClassName('cell truncate-text')}>
             {cell.render()}
-          </div>
+          </td>
         )
       })}
     </>
@@ -32,13 +32,13 @@ const EmptyCells = ({ emptyRow }: { emptyRow: EmptyRow }) => {
   return (
     <>
       {emptyRow.cells.map((cell, j) => {
-        return <div key={j} className={`${cell} cell empty`}></div>
+        return <td key={j} className={`${cell} cell empty`}></td>
       })}
     </>
   )
 }
 
-export default function DivTable<T>({ columns, data, onTableQueryChange }: DivTableProps<T>) {
+export default function Table<T>({ columns, data, onTableQueryChange }: TableProps<T>) {
   const { headers, rows, sorts, filters } = useTable({
     columns,
     data,
@@ -65,33 +65,31 @@ export default function DivTable<T>({ columns, data, onTableQueryChange }: DivTa
   }, [sorts, filters, onTableQueryChange])
 
   return (
-    <div className="table">
-      <div className="header-container">
-        <div className="headers">
+    <table className="table">
+      <thead className="header-container">
+        <tr className="headers">
           {headers.map((column, i) => (
-            <div key={i} className={column.getClassName('header-column')} {...column.getHeaderProps()}>
+            <th key={i} className={column.getClassName('header-column')} {...column.getHeaderProps()}>
               <div className="header-text">
                 {column.render()} {renderSortOrder(column.sortOrder)}
               </div>
               {column.renderFilter && column.renderFilter()}
-            </div>
+            </th>
           ))}
-        </div>
-      </div>
-      <div>
-        <VirtualScroller className="content-viewport" itemHeight={40} amount={10} maxIndex={rows.length - 1}>
-          {({ index }) => {
-            const row = rows[index]
-            const styleClass = index % 2 ? 'even' : 'odd'
+        </tr>
+      </thead>
+      <TableVirtualScroller className="content-viewport" itemHeight={40} amount={10} maxIndex={rows.length - 1}>
+        {({ index }) => {
+          const row = rows[index]
+          const styleClass = index % 2 ? 'even' : 'odd'
 
-            return (
-              <div className={`row ${styleClass}`} key={index}>
-                {row ? <Cells row={row} /> : <EmptyCells emptyRow={emptyRow} />}
-              </div>
-            )
-          }}
-        </VirtualScroller>
-      </div>
-    </div>
+          return (
+            <tr className={`row ${styleClass}`} key={index}>
+              {row ? <Cells row={row} /> : <EmptyCells emptyRow={emptyRow} />}
+            </tr>
+          )
+        }}
+      </TableVirtualScroller>
+    </table>
   )
 }
