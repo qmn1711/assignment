@@ -96,3 +96,21 @@ test('loads and display error message', async () => {
   expect(container.getElementsByClassName('loader').length).toBe(1)
   await waitFor(() => expect(container.getElementsByClassName('message error').length).toBe(1))
 })
+
+test('can handle browser history navigation correctly', async () => {
+  const { container } = render(<Candidates endpoint="/candidates" />)
+  const popStateSpy = jest.fn()
+
+  window.addEventListener('popstate', popStateSpy)
+
+  await waitFor(() => expect(container.getElementsByClassName('table').length).toBe(1))
+  expect(container.querySelectorAll('.cell.name:not(.empty)').length).toBe(3)
+
+  fireEvent.popState(window, {
+    location: '',
+    state: { query: '?filter_name=morar' },
+  })
+
+  expect(popStateSpy).toHaveBeenCalledTimes(1)
+  expect(container.querySelectorAll('.cell.name:not(.empty)').length).toBe(1)
+})

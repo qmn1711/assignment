@@ -29,12 +29,25 @@ export function buildUrlParams(sorts: Sort[], filters: Filter[]) {
       filters
         .filter((filter) => filter.filterValue)
         .map((filter) => {
-          return `${FILTER_PREFIX}${filter.accessor}=${filter.filterValue}`
+          return `${FILTER_PREFIX}${filter.accessor}=${encodeURIComponent(filter.filterValue)}`
         })
     )
   }
 
   return isEmpty(params) ? '' : params.join('&')
+}
+
+export function sortByAccessor(itemA: Sort | Filter, itemB: Sort | Filter) {
+  let result = 0
+  if (itemA.accessor < itemB.accessor) {
+    result = -1
+  }
+
+  if (itemA.accessor > itemB.accessor) {
+    result = 1
+  }
+
+  return result
 }
 
 export function buildTableQueryFromUrlParams(urlParams: string): TableQuery {
@@ -57,11 +70,19 @@ export function buildTableQueryFromUrlParams(urlParams: string): TableQuery {
         } else if (current.startsWith(FILTER_PREFIX)) {
           const [filter, filterValue] = current.split('=')
           const accessor = filter.split(FILTER_PREFIX)[1]
-          accum.filters.push({ accessor, filterValue })
+          accum.filters.push({ accessor, filterValue: decodeURIComponent(filterValue) })
         }
 
         return accum
       }, result)
+
+    if (!isEmpty(result.sorts)) {
+      result.sorts.sort(sortByAccessor)
+    }
+
+    if (!isEmpty(result.filters)) {
+      result.filters.sort(sortByAccessor)
+    }
   }
 
   return result

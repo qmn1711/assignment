@@ -195,7 +195,7 @@ describe('useTable with sorts', () => {
     expect(thirdRowFirstCell.render()).toBe(Data[2].name)
     expect(thirdRowSecondCell.render()).toBe(Data[2].age)
 
-    expect(result.current.sorts).toMatchObject([sortFirstColumn, sortSecondColumn])
+    expect(result.current.sorts).toMatchObject([sortSecondColumn, sortFirstColumn])
     expect(result.current.filters.length).toBe(0)
   })
 })
@@ -380,7 +380,7 @@ describe('useTable with filters', () => {
     expect(firstRowThirdCell.render()).toBe(Data[1].role)
 
     expect(result.current.sorts.length).toBe(0)
-    expect(result.current.filters).toMatchObject([filterFirstColumn, filterSecondColumn, filterThirdColumn])
+    expect(result.current.filters).toMatchObject([filterSecondColumn, filterFirstColumn, filterThirdColumn])
   })
 })
 

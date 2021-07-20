@@ -86,17 +86,26 @@ const getColumns = () => {
 }
 
 const changeUrl = (sorts: Sort[], filters: Filter[]) => {
-  const result = buildUrlParams(sorts, filters)
-  const newUrl = `${window.location.origin}${result ? `?${result}` : ''}`
-  window.history.pushState(result, result, newUrl)
+  let query = buildUrlParams(sorts, filters)
+  query = query ? `?${query}` : ''
+  const newUrl = `${window.location.origin}${query ? `${query}` : ''}`
+
+  if (!window.history.state) {
+    window.history.replaceState({ query }, query, query)
+  } else if (query !== window.history.state.query) {
+    window.history.pushState({ query }, query, newUrl)
+  }
 }
 
 const ErrorMsg = ({ errorMsg }: { errorMsg: string }) => {
-  return <div className="message error">{`${errorMsg}`}</div>
+  return (
+    <div className="message error">
+      {`${errorMsg}`} - Please <a href={window.location.href}>try again</a>.
+    </div>
+  )
 }
 
 const getErrorMsg = ({ code }: { code: number; message: string }) => {
-  const suffix = 'Please try again!'
   let msg = 'Error occurred'
 
   switch (code) {
@@ -105,16 +114,23 @@ const getErrorMsg = ({ code }: { code: number; message: string }) => {
       break
   }
 
-  return [msg, suffix].join(' - ')
+  return msg
 }
 
 function Candidates({ endpoint }: { endpoint: string }) {
   const [isLoading, setLoading] = useState(false)
   const [data, setData] = useState([])
   const [errorMsg, setErrorMsg] = useState('')
+  const [tableQuery, setTableQuery] = useState(() => buildTableQueryFromUrlParams(window.location.search))
 
-  const tableQuery = useMemo(() => buildTableQueryFromUrlParams(window.location.search), [])
   const columns = useMemo(() => addTableQueryToColumns(getColumns(), tableQuery), [tableQuery])
+
+  useEffect(() => {
+    window.onpopstate = (event: PopStateEvent) => {
+      const query = buildTableQueryFromUrlParams(event.state?.query)
+      setTableQuery(query)
+    }
+  }, [])
 
   useEffect(() => {
     async function fetchData() {

@@ -1,5 +1,11 @@
 import { Filter, Sort } from '../hooks/useTable.type'
-import { calculateAge, capitalizeFirstLetter, buildUrlParams, buildTableQueryFromUrlParams } from './utils'
+import {
+  calculateAge,
+  capitalizeFirstLetter,
+  buildUrlParams,
+  buildTableQueryFromUrlParams,
+  sortByAccessor,
+} from './utils'
 
 test('calculateAge should return correct value', () => {
   expect(calculateAge(new Date('1988-01-01'))).toBe(33)
@@ -31,5 +37,16 @@ describe('build url params and table query objects', () => {
     expect(buildTableQueryFromUrlParams('?' + sortQueryUrl)).toStrictEqual({ sorts: [sort], filters: [] })
     expect(buildTableQueryFromUrlParams('?' + filterQueryUrl)).toStrictEqual({ sorts: [], filters: [filter] })
     expect(buildTableQueryFromUrlParams('?' + sortFilterQueryUrl)).toStrictEqual({ sorts: [sort], filters: [filter] })
+  })
+
+  test('sortByAccessor should compare correctly', () => {
+    const sortA = sort
+    const sortB: Sort = { accessor: 'name', sort: 'desc' }
+    const sortC: Sort = { accessor: 'name', sort: 'asc' }
+
+    expect(sortByAccessor(sortA, sortB)).toBe(-1)
+    expect(sortByAccessor(sortB, sortA)).toBe(1)
+    expect(sortByAccessor(sortB, sortC)).toBe(0)
+    expect(sortByAccessor(sortC, sortB)).toBe(0)
   })
 })
