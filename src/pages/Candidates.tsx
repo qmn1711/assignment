@@ -7,6 +7,7 @@ import SelectFilter from '../components/common/SelectFilter'
 import Loader from '../components/common/Loader'
 import { addTableQueryToColumns } from '../hooks/useTable'
 import Table from '../components/list/Table'
+import sampleData from '../sample_data.json'
 
 import './Candidates.scss'
 
@@ -119,7 +120,7 @@ const getErrorMsg = ({ code }: { code: number; message: string }) => {
 
 function Candidates({ endpoint }: { endpoint: string }) {
   const [isLoading, setLoading] = useState(false)
-  const [data, setData] = useState([])
+  const [data, setData] = useState(sampleData.data)
   const [errorMsg, setErrorMsg] = useState('')
   const [tableQuery, setTableQuery] = useState(() => buildTableQueryFromUrlParams(window.location.search))
 
@@ -153,7 +154,7 @@ function Candidates({ endpoint }: { endpoint: string }) {
       }
     }
 
-    fetchData()
+    // fetchData()
   }, [endpoint])
 
   const renderContent = () => {
