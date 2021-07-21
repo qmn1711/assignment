@@ -1,13 +1,13 @@
 @import '../styles/_variables.scss';
 
 $columns: (
-  'name' 170px 'flex',
-  'email' 252px 'flex',
-  'birth_date' 56px 100px,
-  'year_of_experience' 110px 200px,
-  'position_applied' 130px 160px,
-  'application_date' 105px 120px,
-  'status' 'flex' 110px
+  'name' 170px 220px,
+  'email' 252px 290px,
+  'birth_date' 56px 66px,
+  'year_of_experience' 110px 120px,
+  'position_applied' 130px 150px,
+  'application_date' 105px 110px,
+  'status' 82px 100px
 );
 
 @mixin column-cell-width($name, $width) {
@@ -24,7 +24,7 @@ $columns: (
 
 .wrapper {
   display: flex;
-  overflow-x: scroll;
+  // overflow-x: auto;
 
   .loader {
     width: 80px;
@@ -33,16 +33,18 @@ $columns: (
 
   .table {
     flex: 1;
-    min-width: 907px;
     border: 2px solid black;
     border-spacing: 0;
 
     .header-container {
+      display: flex;
+      flex-direction: row;
       background: #ccc;
 
       .headers {
         display: flex;
         flex-direction: row;
+        width: 100%;
 
         .header-column {
           display: flex;

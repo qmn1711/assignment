@@ -119,11 +119,11 @@ function VirtualScroller({ itemHeight, amount, maxIndex, children, className }: 
 
   return (
     <tbody className={className} ref={viewportElement} onScroll={runScroller} style={{ height: viewportHeight }}>
-      <tr style={{ height: topPaddingHeight }} />
+      <tr style={{ display: 'block', height: topPaddingHeight }} />
       {data.map((index: number) => {
         return children({ index })
       })}
-      <tr style={{ height: bottomPaddingHeight }} />
+      <tr style={{ display: 'block', height: bottomPaddingHeight }} />
     </tbody>
   )
 }
