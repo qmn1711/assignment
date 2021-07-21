@@ -1,6 +1,21 @@
-.filter-input {
+.filter-input-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   margin-top: 5px;
-  width: 90px;
-  border-radius: 9px;
   padding: 1px 5px;
+  border-radius: 9px;
+  background: #fff;
+  max-width: 90px;
+
+  .filter-input {
+    width: 100%;
+    border: none;
+  }
+
+  .close-icon {
+    width: 13px;
+    height: 13px;
+    cursor: pointer;
+  }
 }
