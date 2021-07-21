@@ -135,8 +135,8 @@ function useTable<T extends { [key: string]: any }>({ columns, data }: TableProp
 
         if (column.sort) {
           const onClick = () => {
-            const sortOrder = isEmpty(column.sortOrder) || column.sortOrder === 'asc' ? 'desc' : 'asc'
-            headers[i] = { ...column, sortOrder: sortOrder }
+            const sortOrder = isEmpty(column.sortOrder) ? 'desc' : column.sortOrder === 'desc' ? 'asc' : undefined
+            headers[i] = { ...column, sortOrder }
             setHeaders([...headers])
           }
 
