@@ -1,4 +1,5 @@
 import isEmpty from 'lodash/isEmpty'
+import trim from 'lodash/trim'
 
 import { Filter, Sort, SortOrder, TableQuery } from '../hooks/useTable.type'
 
@@ -70,7 +71,7 @@ export function buildTableQueryFromUrlParams(urlParams: string): TableQuery {
         } else if (current.startsWith(FILTER_PREFIX)) {
           const [filter, filterValue] = current.split('=')
           const accessor = filter.split(FILTER_PREFIX)[1]
-          accum.filters.push({ accessor, filterValue: decodeURIComponent(filterValue) })
+          accum.filters.push({ accessor, filterValue: trim(decodeURIComponent(filterValue)) })
         }
 
         return accum

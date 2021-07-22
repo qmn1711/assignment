@@ -4,7 +4,7 @@ import orderBy from 'lodash/orderBy'
 import filter from 'lodash/filter'
 import isFunction from 'lodash/isFunction'
 import find from 'lodash/find'
-import trim from 'lodash/trimStart'
+import trim from 'lodash/trim'
 import trimStart from 'lodash/trimStart'
 
 import {
@@ -45,11 +45,11 @@ const filterData = <T>(data: T[], columns: Column<T>[]): T[] => {
 
       for (let i = 0; i < filters.length; i++) {
         const value = row[filters[i].accessor]
-        const filterValue = filters[i].filterValue as string
+        const filterValue = trim(filters[i].filterValue).toLowerCase()
 
         switch (typeof value) {
           case 'string':
-            match = value.toLowerCase().includes(filterValue.toLowerCase())
+            match = value.toLowerCase().includes(filterValue)
             break
           case 'number':
             match = value === parseInt(filterValue)
@@ -95,7 +95,7 @@ const getFilters = <T>(columns: TableColumn<T>[]): Filter[] => {
     result = filter(columns, (column) => !!column.filter && !!trim(column.filterValue))
       .map((column) => ({
         accessor: column.accessor,
-        filterValue: column.filterValue as string,
+        filterValue: trim(column.filterValue),
       }))
       .sort(sortByAccessor)
   }
