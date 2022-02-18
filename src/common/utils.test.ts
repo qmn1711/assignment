@@ -8,7 +8,7 @@ import {
 } from './utils'
 
 test('calculateAge should return correct value', () => {
-  expect(calculateAge(new Date('1988-01-01'))).toBe(33)
+  expect(calculateAge(new Date('1988-01-01'))).toBe(new Date().getFullYear() - 1988)
 })
 
 test('capitalizeFirstLetter should return correct value', () => {

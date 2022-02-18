@@ -1,8 +1,8 @@
-# Assignment
+# Simple React Table [![codecov](https://codecov.io/gh/qmn1711/simple-react-table/branch/main/graph/badge.svg?token=X8T52W5HWD)](https://codecov.io/gh/qmn1711/simple-react-table)
+A react hook is like react table with only basic features: listing, sorting, filtering.
 
-A simple candidate applications management: listing, sorting, filtering.
 
-See the [demo](https://applications-demo.netlify.app).
+Check out the candidate applications management [demo](https://applications-demo.netlify.app).
 
 # Getting Started
 
@@ -69,4 +69,4 @@ Formats the code in `src`.
 
 # Contributing
 
-If you have ideas or something doesn’t work, please [file an issue](https://github.com/qmn1711/assignment/issues).
+If you have ideas or something doesn’t work, please [file an issue](https://github.com/qmn1711/simple-react-table/issues).
