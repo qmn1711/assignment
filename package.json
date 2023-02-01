@@ -2,6 +2,9 @@
   "name": "simple-react-table",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "14.18.3"
+  },
   "dependencies": {
     "lodash": "^4.17.21",
     "react": "^17.0.2",

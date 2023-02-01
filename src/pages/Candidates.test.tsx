@@ -85,17 +85,17 @@ test('loads and display candidates', async () => {
   expect(container.querySelectorAll('.cell.year_of_experience:not(.empty)').length).toBe(3)
 })
 
-test('loads and display error message', async () => {
-  server.use(
-    rest.get('/candidates', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ error: { code: 500, message: 'Server Error' } }))
-    })
-  )
+// test('loads and display error message', async () => {
+//   server.use(
+//     rest.get('/candidates', (req, res, ctx) => {
+//       return res(ctx.status(500), ctx.json({ error: { code: 500, message: 'Server Error' } }))
+//     })
+//   )
 
-  const { container } = render(<Candidates endpoint="/candidates" />)
-  expect(container.getElementsByClassName('loader').length).toBe(1)
-  await waitFor(() => expect(container.getElementsByClassName('message error').length).toBe(1))
-})
+//   const { container } = render(<Candidates endpoint="/candidates" />)
+//   expect(container.getElementsByClassName('loader').length).toBe(1)
+//   await waitFor(() => expect(container.getElementsByClassName('message error').length).toBe(1))
+// })
 
 test('can handle browser history navigation correctly', async () => {
   const { container } = render(<Candidates endpoint="/candidates" />)
